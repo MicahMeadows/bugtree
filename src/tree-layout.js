@@ -8,11 +8,17 @@ export function nodeHeight(node) {
   const notes = node.bullets.reduce((height, text) => height + Math.max(1, Math.ceil(text.length / noteWidth)) * 18 + 7, 0)
   return Math.max(node.photo ? (node.name.length > 25 ? 242 : 218) : 140, (node.name.length > 25 ? 112 : 94) + notes)
 }
-export function layoutTree(nodes, expandedId = null, expandedHeight = 0) {
+export function layoutTree(nodes, expandedId = null, expandedHeight = 0, layoutStyle = 'tree') {
   if (!nodes.length) return { items: [], edges: [], width: 500, height: 300, layers: [] }
   const children = new Map(nodes.map((node) => [node.id, nodes.filter((n) => n.parentId === node.id)]))
   const spans = new Map()
   const root = nodes.find((node) => node.parentId === null)
+  let maxDepth = 0
+  function findDepth(node, depth) {
+    maxDepth = Math.max(maxDepth, depth)
+    for (const child of children.get(node.id)) findDepth(child, depth + 1)
+  }
+  findDepth(root, 0)
   const heightFor = (node) => node.id === expandedId ? Math.max(nodeHeight(node) + 56, expandedHeight) : nodeHeight(node)
   function measure(node) {
     const branch = children.get(node.id)
@@ -24,9 +30,11 @@ export function layoutTree(nodes, expandedId = null, expandedHeight = 0) {
   const items = [], edges = [], layers = []
   function place(node, depth, top) {
     const height = heightFor(node)
-    const x = PAD + depth * (NODE_WIDTH + COLUMN_GAP)
+    const isLeaf = children.get(node.id).length === 0
+    const column = layoutStyle === 'column' && isLeaf ? maxDepth : depth
+    const x = PAD + column * (NODE_WIDTH + COLUMN_GAP)
     const y = top + (spans.get(node.id) - height) / 2
-    const item = { ...node, x, y, width: NODE_WIDTH, height, depth }
+    const item = { ...node, x, y, width: NODE_WIDTH, height, depth, isLeaf }
     items.push(item)
     if (!layers[depth]) layers[depth] = new Set()
     if (node.rank && node.rank.trim().toLowerCase() !== 'group') layers[depth].add(node.rank)

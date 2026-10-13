@@ -1,3 +1,5 @@
+import bugtreeIcon from './assets/bugtree-icon.png'
+
 const paths = {
   plus: <path d="M12 5v14M5 12h14" />,
   back: <path d="m14 6-6 6 6 6M8 12h12" />,
@@ -20,5 +22,5 @@ export function Icon({ name, size = 18, ...props }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name] || paths.tree}</svg>
 }
 export function Beetle({ size = 32 }) {
-  return <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true"><g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="m15 12-4-6m14 6 4-6M12 18l-6-3m6 9-7 2m9 4-5 6m19-18 6-3m-6 9 7 2m-9 4 5 6" /><ellipse cx="20" cy="24" rx="9" ry="12" fill="currentColor" fillOpacity=".12" /><path d="M15 13c0-7 10-7 10 0M20 13v23" /></g></svg>
+  return <img src={bugtreeIcon} width={size} height={size} alt="" aria-hidden="true" className="bugtree-icon" />
 }

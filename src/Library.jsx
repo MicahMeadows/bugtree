@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { siteApi } from './supabase'
 import { Icon } from './Icons'
 import DeleteDialog from './DeleteDialog'
-import BugFriends from './BugFriends'
 
 function TreePreview({ count = 1 }) {
   const leaves = Math.min(4, Math.max(1, count - 1))
@@ -60,7 +59,6 @@ export default function Library({ onOpen, onAuthError }) {
       </article>)}
       <button className="new-chart-card" onClick={() => setCreating(true)} disabled={busy}><span className="plus-circle"><Icon name="plus" size={25} /></span><strong>New tree</strong></button>
     </div>}
-    <BugFriends className="library-friends" />
     {deletingChart && <DeleteDialog name={deletingChart.name} kind="tree" description="This removes the entire tree from your library." onConfirm={() => remove(deletingChart)} onCancel={() => setDeletingChart(null)} />}
     {creating && <dialog ref={dialog} className="create-dialog" onCancel={(event) => { if (busy) event.preventDefault(); else setCreating(false) }} onClose={() => setCreating(false)}>
       <button className="icon-button dialog-close" aria-label="Close" disabled={busy} onClick={() => setCreating(false)}><Icon name="close" /></button><h2>New tree</h2>

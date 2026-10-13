@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { layoutTree, NODE_WIDTH, COLUMN_GAP } from './tree-layout'
+import { layoutTree, NODE_WIDTH } from './tree-layout'
 import { Icon } from './Icons'
 import { siblingDrop } from './tree-order'
 import antPattern from './assets/ant-pattern.svg?no-inline'
 import { zoomAt, fitCamera, wheelZoom, pinchCamera } from './canvas-camera'
 
 export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, busy, onAddChild, onAddSibling, onReorder, renderEditor }) {
+  const [layoutStyle, setLayoutStyle] = useState('column')
+  const layoutStyleRef = useRef(layoutStyle)
+  layoutStyleRef.current = layoutStyle
   const [expandedSize, setExpandedSize] = useState({ id: null, height: 0 })
   const onHeightChange = useCallback((id, height) => setExpandedSize((previous) => previous.id === id && previous.height === height ? previous : { id, height }), [])
-  const layout = useMemo(() => layoutTree(nodes, mode === 'edit' ? selectedId : null, expandedSize.id === selectedId ? expandedSize.height : 0), [nodes, selectedId, mode, expandedSize])
+  const layout = useMemo(() => layoutTree(nodes, mode === 'edit' ? selectedId : null, expandedSize.id === selectedId ? expandedSize.height : 0, layoutStyle), [nodes, selectedId, mode, expandedSize, layoutStyle])
   const [camera, setCamera] = useState({ x: 0, y: 0, zoom: .8 })
   const [panning, setPanning] = useState(false)
   const [reordering, setReordering] = useState(null)
@@ -21,6 +24,20 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
   const didFit = useRef(false)
   layoutRef.current = layout
   function updateCamera(next) { cameraRef.current = next; setCamera(next) }
+  function startingCamera(tree, width, height, style) {
+    if (style === 'tree') return fitCamera(tree.width, tree.height, width, height)
+    const first = tree.items.find((item) => item.isLeaf)
+    if (!first) return fitCamera(tree.width, tree.height, width, height)
+    const zoom = Math.min(1, Math.max(.1, (width - 48) / NODE_WIDTH))
+    return { zoom, x: width - 40 - (first.x + first.width) * zoom, y: 32 - first.y * zoom }
+  }
+  function switchLayout(next) {
+    if (next === layoutStyle || pointers.current.size) return
+    setLayoutStyle(next)
+    const el = viewport.current
+    const tree = layoutTree(nodes, mode === 'edit' ? selectedId : null, expandedSize.id === selectedId ? expandedSize.height : 0, next)
+    if (el) updateCamera(startingCamera(tree, el.clientWidth, el.clientHeight, next))
+  }
   function fit() {
     const el = viewport.current
     if (el) updateCamera(fitCamera(layout.width, layout.height, el.clientWidth, el.clientHeight))
@@ -36,7 +53,7 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
       if (!width || !height) return
       if (!didFit.current) {
         const tree = layoutRef.current
-        updateCamera(fitCamera(tree.width, tree.height, width, height))
+        updateCamera(startingCamera(tree, width, height, layoutStyleRef.current))
         didFit.current = true
       } else {
         const current = cameraRef.current
@@ -143,7 +160,6 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
         <div className="canvas-pattern" aria-hidden="true" style={{ backgroundImage: `url("${antPattern}")`, backgroundPosition: patternPosition, backgroundSize: patternSize, opacity: 1 - dotOpacity }} />
         <div className="canvas-pattern" aria-hidden="true" style={{ backgroundImage: `radial-gradient(circle at 50% 50%, #838584 ${2.4 * camera.zoom}px, transparent ${3 * camera.zoom}px)`, backgroundPosition: patternPosition, backgroundSize: patternSize, opacity: dotOpacity }} />
         <div className="tree-stage" style={{ width: layout.width, height: layout.height, transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.zoom})` }}>
-          {layout.layers.map((label, depth) => <div className="layer-label" key={depth} style={{ left: 72 + depth * (NODE_WIDTH + COLUMN_GAP), width: NODE_WIDTH }}><span>LAYER {depth + 1}</span><strong>{label}</strong></div>)}
           <svg className="tree-connections" width={layout.width} height={layout.height} aria-hidden="true"><defs><marker id="branch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#9b89b2" /></marker></defs>{layout.edges.map((edge) => <path key={edge.id} d={edge.d} fill="none" stroke="#9b89b2" strokeWidth="1.6" strokeLinejoin="round" markerEnd="url(#branch-arrow)" />)}</svg>
           {layout.items.map((node) => <div key={node.id} role={mode === 'edit' && selectedId === node.id ? 'group' : 'button'} tabIndex={0} aria-label={`${node.name}${node.rank && node.rank.trim().toLowerCase() !== 'group' ? `, ${node.rank}` : ''}. ${mode === 'edit' ? 'Edit taxon' : 'Read study notes'}`} aria-pressed={mode === 'edit' && selectedId === node.id ? undefined : selectedId === node.id} data-node-id={node.id} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onSelect(node.id) } }} className={`taxon-card ${node.color} ${node.photo || node.bullets.length ? 'detailed' : 'group-node'} ${selectedId === node.id ? 'selected' : ''} ${mode === 'edit' && selectedId === node.id ? 'editing-card' : ''} ${reordering?.nodeId === node.id ? 'reordering-card' : ''}`} style={{ left: node.x, top: node.y, width: node.width, height: node.height, transform: reordering?.nodeId === node.id ? `translateY(${reordering.offsetY}px)` : undefined }}>
             {mode === 'edit' && node.parentId !== null && nodes.filter((n) => n.parentId === node.parentId).length > 1 && <button data-reorder-handle className="card-drag-handle" disabled={busy} aria-label={`Reorder ${node.name}`} title="Drag to reorder; arrow keys move up or down" onKeyDown={(event) => { if (event.key === 'ArrowUp' || event.key === 'ArrowDown') { event.preventDefault(); const siblings = nodes.filter((n) => n.parentId === node.parentId); onReorder(node.id, siblings.findIndex((n) => n.id === node.id) + (event.key === 'ArrowUp' ? -1 : 1)) } }}><span>⠿</span></button>}
@@ -163,6 +179,6 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
           </div>)}
         </div>
     </div>
-    <div className="canvas-controls"><button className="icon-button" aria-label="Zoom out" onClick={() => zoomCenter(1 / 1.2)}>−</button><span>{Math.round(camera.zoom * 100)}%</span><button className="icon-button" aria-label="Zoom in" onClick={() => zoomCenter(1.2)}>+</button><span className="control-divider" /><button className="icon-button" aria-label="Fit tree to screen" title="Fit tree to screen" onClick={fit}><Icon name="fit" /></button></div>
+    <div className="canvas-controls"><span className="alignment-label">Alignment</span><div className="layout-toggle" aria-label="Alignment"><button className={layoutStyle === 'column' ? 'active' : ''} aria-pressed={layoutStyle === 'column'} onClick={() => switchLayout('column')} title="Align all leaf cards in one vertical column">Column</button><button className={layoutStyle === 'tree' ? 'active' : ''} aria-pressed={layoutStyle === 'tree'} onClick={() => switchLayout('tree')} title="Original branching layout">Graph</button></div><span className="control-divider" /><button className="icon-button" aria-label="Zoom out" onClick={() => zoomCenter(1 / 1.2)}>−</button><span>{Math.round(camera.zoom * 100)}%</span><button className="icon-button" aria-label="Zoom in" onClick={() => zoomCenter(1.2)}>+</button><span className="control-divider" /><button className="icon-button" aria-label="Fit tree to screen" title="Fit tree to screen" onClick={fit}><Icon name="fit" /></button></div>
   </div>
 }
