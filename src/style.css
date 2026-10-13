@@ -332,8 +332,7 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .redirect-tools { display: flex; flex-direction: column; gap: 10px; padding: 12px 4px; font-size: 12px; }
 
 .redirect-node.circle-node { background: transparent; box-shadow: none; border: 2px dashed #838584; overflow: visible; }
-.redirect-delete { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: transparent; color: #875779; border: 0; line-height: 1; font-size: 16px; opacity: 0; pointer-events: none; }
-.redirect-node:hover .redirect-delete, .redirect-node:focus-within .redirect-delete { opacity: 1; pointer-events: auto; }
+.redirect-delete { position: absolute; right: -14px; top: -14px; width: 20px; height: 20px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fffaf1; color: #875779; border: 1px solid var(--border); line-height: 1; font-size: 16px; cursor: pointer; }
 .connector-hit-area { pointer-events: stroke; cursor: crosshair; }
 .connector-hit-area:hover, .connector-hit-area:focus { stroke: #a17abb30; outline: none; }
 

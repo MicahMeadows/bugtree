@@ -189,7 +189,11 @@ try {
   const routeProps = { ...props, initialChart: { ...chart, nodes: routed.nodes } }
   const routeEdit = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'edit' }))
   const routeView = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'view' }))
-  assert.ok(routeEdit.includes('Delete redirect') && routeEdit.includes('Add redirect on this branch'))
+  assert.ok(!routeEdit.includes('Delete redirect') && routeEdit.includes('Add redirect on this branch'), 'Redirect delete is hidden until selected')
+  const { default: TreeCanvas } = await server.ssrLoadModule('/src/TreeCanvas.jsx')
+  const selectedRoute = renderToStaticMarkup(createElement(TreeCanvas, { nodes: routed.nodes, photos: {}, selectedId: routed.redirect.id, mode: 'edit' }))
+  assert.ok(selectedRoute.includes('Delete redirect'), 'Selecting a redirect exposes its delete button')
+  assert.ok(!selectedRoute.includes('Taxon editor'), 'Redirect selection must keep it as a draggable circle')
   assert.ok(!routeView.includes('redirect-node') && !routeView.includes('Delete redirect') && !routeView.includes('Add redirect on this branch'))
   assert.ok(edit.includes('Add child to') && edit.includes('Add sibling to'))
   assert.ok(!edit.includes('canvas-add-tools'))

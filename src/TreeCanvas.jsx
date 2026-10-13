@@ -72,7 +72,7 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
     if (mode !== 'edit' || !selectedId || !didFit.current) return
     const item = layout.items.find((n) => n.id === selectedId)
     const el = viewport.current, current = cameraRef.current
-    if (!item || !el) return
+    if (!item || !el || item.type === 'redirect') return
     const zoom = Math.max(current.zoom, Math.min(1, (el.clientHeight - 100) / item.height))
     updateCamera({ zoom, x: el.clientWidth / 2 - (item.x + item.width / 2) * zoom, y: 60 + (el.clientHeight - 100 - item.height * zoom) / 2 - item.y * zoom })
   }, [selectedId, mode])
@@ -128,7 +128,8 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
       const current = point(event)
       onMoveNode(active.nodeId, (current.x - active.start.x) / active.camera.zoom, (current.y - active.start.y) / active.camera.zoom)
     }
-    if (!cancelled && ['pan', 'move'].includes(active?.type) && !active.moved && active.nodeId) nodes.find((n) => n.id === active.nodeId)?.type !== 'redirect' && onSelect(active.nodeId)
+    if (!cancelled && ['pan', 'move'].includes(active?.type) && !active.moved && active.nodeId) onSelect(active.nodeId)
+    if (!cancelled && active?.type === 'pan' && !active.moved && !active.nodeId) onSelect(null)
     setReordering(null)
     if (pointers.current.size === 1) {
       gesture.current = { type: 'pan', start: [...pointers.current.values()][0], camera: cameraRef.current, moved: true, nodeId: null }
@@ -159,7 +160,7 @@ export default function TreeCanvas({ nodes, photos, selectedId, onSelect, mode, 
           <svg className="tree-connections" width={layout.width} height={layout.height} aria-hidden={mode === 'edit' ? undefined : true}><defs><marker id="branch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#9b89b2" /></marker></defs>{layout.edges.map((edge) => <g key={edge.id}><path d={connection(edge)} fill="none" stroke="#9b89b2" strokeWidth="1.6" strokeLinejoin="round" markerEnd={nodes.find((n) => n.id === edge.id)?.type === 'redirect' ? undefined : 'url(#branch-arrow)'} />{mode === 'edit' && !columnOnly && <path className="connector-hit-area" d={connection(edge)} fill="none" stroke="transparent" strokeWidth="16" role="button" tabIndex={0} aria-label="Add redirect on this branch" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); if (busy) return; const p = point(e); onAddRedirect(edge.id, { x: (p.x - cameraRef.current.x) / cameraRef.current.zoom, y: (p.y - cameraRef.current.y) / cameraRef.current.zoom }, layout) }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!busy) { const child = layout.items.find((n) => n.id === edge.id); onAddRedirect(edge.id, { x: child.x - 45, y: child.y + child.height / 2 }, layout) } } }}><title>Click to add redirect</title></path>}</g>)}</svg>
           {layout.items.filter((node) => mode === 'edit' || node.type !== 'redirect').map((node) => <div key={node.id} role={mode === 'edit' && node.type !== 'redirect' && selectedId === node.id ? 'group' : 'button'} tabIndex={0} aria-label={`${node.name || (node.type === 'redirect' ? 'Redirect' : 'Suborder')}${node.rank && node.rank.trim().toLowerCase() !== 'group' ? `, ${node.rank}` : ''}. ${mode === 'edit' ? 'Edit taxon' : 'Read study notes'}`} aria-pressed={mode === 'edit' && node.type !== 'redirect' && selectedId === node.id ? undefined : selectedId === node.id} data-node-id={node.id} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onSelect(node.id) } }} className={`taxon-card ${node.color} ${node.type === 'redirect' ? `redirect-node ${canMove ? 'draggable' : ''}` : ''} ${isCircle(node) && !(mode === 'edit' && node.type !== 'redirect' && selectedId === node.id) ? 'circle-node' : ''} ${node.photo || node.bullets.length ? 'detailed' : 'group-node'} ${selectedId === node.id ? 'selected' : ''} ${mode === 'edit' && node.type !== 'redirect' && selectedId === node.id ? 'editing-card' : ''} ${reordering?.nodeId === node.id ? 'reordering-card' : ''}`} style={{ left: node.x, top: node.y, width: node.width, height: node.height, transform: movingBranch.has(node.id) ? `translate(${reordering.offsetX || 0}px, ${reordering.offsetY}px)` : undefined }}>
             {canMove && node.type !== 'redirect' && <button data-reorder-handle className="card-drag-handle" disabled={busy} aria-label={`Move ${node.name || 'Suborder'} and children`} title="Drag to move this branch"><span>⠿</span></button>}
-            {node.type === 'redirect' && <button className="redirect-delete" disabled={busy} aria-label="Delete redirect" title="Delete redirect" onClick={() => onDeleteRedirect(node.id)}>×</button>}
+            {node.type === 'redirect' && selectedId === node.id && <button className="redirect-delete" disabled={busy} aria-label="Delete redirect" title="Delete redirect" onClick={() => onDeleteRedirect(node.id)}>×</button>}
             {mode === 'edit' && node.type !== 'redirect' && selectedId === node.id ? renderEditor?.(onHeightChange) : <>
             {!isCircle(node) && <div className="taxon-label">{node.rank && node.rank.trim().toLowerCase() !== 'group' && <span>{node.rank}</span>}<h3>{node.name || 'Unnamed taxon'}</h3></div>}
             {!isCircle(node) && (node.photo || node.bullets.length > 0) && <div className={`taxon-content ${node.photo ? 'has-photo' : ''}`}>
