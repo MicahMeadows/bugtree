@@ -28,6 +28,12 @@ export default function App() {
 
   useEffect(() => { if (session) void loadTodos(); else setLoading(false) }, [session])
 
+  useEffect(() => {
+    if (!session) return
+    const timer = setTimeout(() => { clearSession(); setSession(null); setTodos([]); setError('Your login expired. Please sign in again.') }, Math.max(0, Date.parse(session.expiresAt) - Date.now()))
+    return () => clearTimeout(timer)
+  }, [session])
+
   function handleError(error) {
     if (error.status === 401) { clearSession(); setSession(null); setTodos([]) }
     setError(error.message)
