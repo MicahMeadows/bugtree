@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { createClient } from '@supabase/supabase-js'
+import { insertRedirect } from '../src/tree-routing.js'
 import { newNode } from '../supabase/functions/site-api/tree-model.js'
 
 const url = process.env.VITE_SUPABASE_URL
@@ -28,9 +29,10 @@ try {
   const created = await call('chart-create', { name: `Taxonomy smoke test ${crypto.randomUUID()}` }, token)
   assert.equal(created.status, 200, JSON.stringify(created.body))
   chart = created.body.data
+  assert.equal(chart.default_color, 'lavender')
   const child = newNode(chart.nodes[0].id, 'Example family', 'Family')
   child.bullets = ['A distinguishing feature', 'A second identification note']
-  const save = await call('chart-save', { ...chart, nodes: [...chart.nodes, child], description: 'Persistence check' }, token)
+  const save = await call('chart-save', { ...chart, nodes: [...chart.nodes, child], description: 'Persistence check', default_color: 'sage' }, token)
   assert.equal(save.status, 200, JSON.stringify(save.body))
   const stale = await call('chart-save', chart, token)
   assert.equal(stale.status, 409, 'Stale edits must not overwrite newer data')
@@ -38,10 +40,21 @@ try {
   const loaded = await call('chart-load', { id: chart.id }, token)
   assert.equal(loaded.status, 200)
   assert.deepEqual(loaded.body.data.nodes, chart.nodes)
+  assert.equal(loaded.body.data.default_color, 'sage')
+  assert.equal(chart.nodes[0].color, 'lavender', 'Default changes preserve existing card colors')
+  assert.equal((await call('chart-save', { ...chart, default_color: 'invalid' }, token)).status, 400)
   const listed = await call('charts-list', {}, token)
   assert.ok(listed.body.data.some((c) => c.id === chart.id && c.node_count === 2))
   const cycle = await call('chart-save', { ...chart, nodes: chart.nodes.map((n) => n.id === chart.nodes[0].id ? { ...n, parentId: child.id } : n) }, token)
   assert.equal(cycle.status, 400)
+  const routing = insertRedirect(chart.nodes, child.id, 'sage')
+  const circle = { ...newNode(chart.nodes[0].id, '', 'Suborder', 'sage'), type: 'suborder' }
+  routing.redirect.offsetX = 180; routing.redirect.offsetY = 70
+  const routeSave = await call('chart-save', { ...chart, nodes: [...routing.nodes, circle] }, token)
+  assert.equal(routeSave.status, 200, JSON.stringify(routeSave.body))
+  chart = routeSave.body.data
+  const routeLoad = await call('chart-load', { id: chart.id }, token)
+  assert.deepEqual(routeLoad.body.data.nodes, chart.nodes, 'Circle types and redirect offsets must survive reloading')
   const invalidImage = await call('photo-upload', { id: chart.id, nodeId: child.id, image: 'data:image/jpeg;base64,SGVsbG8=' }, token)
   assert.equal(invalidImage.status, 400)
   const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6ocAAAAASUVORK5CYII='

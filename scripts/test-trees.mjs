@@ -2,9 +2,10 @@ import assert from 'node:assert/strict'
 import { createServer } from 'vite'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
-import { newNode, validateNodes, descendants, reorderNode } from '../supabase/functions/site-api/tree-model.js'
+import { newNode, isCircle, validateNodes, descendants, reorderNode } from '../supabase/functions/site-api/tree-model.js'
 import { layoutTree } from '../src/tree-layout.js'
 import { moveSibling, siblingDrop, isDefaultTaxon } from '../src/tree-order.js'
+import { insertRedirect, insertRedirectAt, removeRedirect, moveRedirect, moveBranch } from '../src/tree-routing.js'
 import { flashcardDeck, shuffleCards } from '../src/flashcard-deck.js'
 import { reconcileSave } from '../src/autosave.js'
 import { zoomAt, wheelZoom, fitCamera, pinchCamera, MIN_ZOOM, MAX_ZOOM } from '../src/canvas-camera.js'
@@ -42,6 +43,9 @@ assert.equal(siblingDrop(layout.items, a.id, -10000).index, 0)
 assert.equal(siblingDrop(layout.items, a.id, 10000).index, 1)
 assert.equal(siblingDrop(layout.items, root.id, 100), null)
 assert.equal(siblingDrop(layout.items, leaf.id, 100), null)
+const coloredFresh = newNode(root.id, 'New taxon', 'Group', 'sage')
+assert.equal(coloredFresh.color, 'sage')
+assert.equal(isDefaultTaxon(coloredFresh, 'sage'), true)
 const fresh = newNode(root.id)
 assert.equal(isDefaultTaxon(fresh), true)
 assert.equal(isDefaultTaxon({ ...fresh, name: 'Apidae' }), false)
@@ -59,6 +63,63 @@ for (let i = 1; i < sortedLeaves.length; i++) assert.ok(sortedLeaves[i - 1].y + 
 const expanded = layoutTree(nodes, a.id, 440)
 assert.equal(expanded.items.find((n) => n.id === a.id).height, 440)
 for (const item of expanded.items) for (const other of expanded.items) if (item.id !== other.id && item.depth === other.depth) assert.ok(item.y + item.height <= other.y || other.y + other.height <= item.y, 'Inline editing must not overlap sibling cards')
+const circle = { ...newNode(root.id, '', 'Suborder', 'sage'), type: 'suborder' }
+assert.equal(isCircle(circle), true)
+assert.equal(validateNodes([root, circle], id), null)
+assert.equal(isCircle({ ...circle, name: 'Named suborder' }), false)
+assert.ok(validateNodes([root, { ...circle, type: 'taxon', rank: 'Family' }], id))
+const routed = insertRedirect(nodes, a.id, 'sage')
+assert.equal(validateNodes(routed.nodes, id), null)
+assert.equal(routed.nodes.find((n) => n.id === a.id).parentId, routed.redirect.id)
+const twice = insertRedirect(routed.nodes, a.id, 'sage')
+assert.equal(validateNodes(twice.nodes, id), null)
+const beforeMove = layoutTree(twice.nodes)
+const moved = layoutTree(moveRedirect(twice.nodes, routed.redirect.id, 120, 80))
+for (const childId of [routed.redirect.id, twice.redirect.id, a.id, leaf.id]) {
+  const before = beforeMove.items.find((n) => n.id === childId), after = moved.items.find((n) => n.id === childId)
+  assert.equal(after.x - before.x, 120, 'Redirect moves the entire subsection horizontally')
+  assert.equal(after.y - before.y, 80, 'Redirect moves the entire subsection vertically')
+}
+assert.deepEqual(removeRedirect(routed.nodes, routed.redirect.id).map(n=>[n.id,n.parentId]), nodes.map(n=>[n.id,n.parentId]), 'Removing routing point preserves descendants')
+assert.ok(validateNodes(routed.nodes.map((n) => n.id === routed.redirect.id ? { ...n, offsetX: Infinity } : n), id))
+const freelyMoved = layoutTree(moveBranch(nodes, a.id, 75, 65))
+for (const childId of [a.id, leaf.id]) {
+  const previous = layout.items.find(n=>n.id===childId), next = freelyMoved.items.find(n=>n.id===childId)
+  assert.equal(next.x - previous.x, 75)
+  assert.equal(next.y - previous.y, 65)
+}
+const negativeMove = layoutTree(moveBranch(nodes, root.id, -500, -300))
+for (const child of layout.items) {
+ const next = negativeMove.items.find(n=>n.id===child.id)
+ assert.equal(next.x - child.x,-500,'Dragging must allow negative coordinates')
+ assert.equal(next.y - child.y,-300)
+}
+const clickedPoint = { x: 450, y: 210 }
+const onLine = insertRedirectAt(nodes, a.id, 'sage', clickedPoint)
+const insertedLayout = layoutTree(onLine.nodes)
+const insertedPoint = insertedLayout.items.find(n=>n.id===onLine.redirect.id)
+assert.equal(insertedPoint.x + insertedPoint.width / 2, clickedPoint.x)
+assert.equal(insertedPoint.y + insertedPoint.height / 2, clickedPoint.y)
+for (const childId of [a.id, leaf.id]) {
+  const previous=layout.items.find(n=>n.id===childId), next=insertedLayout.items.find(n=>n.id===childId)
+  assert.equal(next.x,previous.x,'Inserting on a line keeps child positions')
+  assert.equal(next.y,previous.y)
+}
+const removedLayout = layoutTree(removeRedirect(onLine.nodes,onLine.redirect.id))
+for (const childId of [a.id,leaf.id]) {
+ const previous=insertedLayout.items.find(n=>n.id===childId),next=removedLayout.items.find(n=>n.id===childId)
+ assert.equal(next.x,previous.x,'Deleting redirect preserves positions');assert.equal(next.y,previous.y)
+}
+const circleLayout=layoutTree([root,circle])
+assert.equal(circleLayout.items.find(n=>n.id===circle.id).width,48)
+assert.equal(circleLayout.items.find(n=>n.id===circle.id).height,48)
+assert.equal(insertedPoint.width,24)
+const positioned = moveBranch(twice.nodes, a.id, 155, 90)
+const beforeColumn = JSON.stringify(positioned)
+const cleanColumn = layoutTree(positioned, null, 0, true)
+assert.ok(cleanColumn.items.every(n=>n.type !== 'redirect'))
+assert.deepEqual(cleanColumn.items.map(n=>[n.id,n.parentId,n.x,n.y,n.width,n.height]).sort(), layout.items.map(n=>[n.id,n.parentId,n.x,n.y,n.width,n.height]).sort(), 'Column toggle restores the original layout without redirects or offsets')
+assert.equal(JSON.stringify(positioned),beforeColumn,'Column mode must not change saved positions or routing')
 const snapshot = { name: 'Before', nodes, version: 1 }
 const saved = { ...snapshot, version: 2, updated_at: '2026-10-13T00:00:00Z' }
 assert.deepEqual(reconcileSave(snapshot, snapshot, saved), { chart: saved, dirty: false })
@@ -89,7 +150,7 @@ const pinch = pinchCamera(camera, { center: pointer, distance: 100 }, { center: 
 assert.equal(pinch.zoom, 1.4)
 assert.ok(Math.abs((360 - pinch.x) / pinch.zoom - world.x) < 1e-8, 'Pinch must combine zoom and midpoint panning')
 assert.ok(Math.abs((235 - pinch.y) / pinch.zoom - world.y) < 1e-8)
-const studyNodes = [{ ...root }, { ...a, name: 'Hidden taxon answer', photo: 'test-photo' }, { ...b, photo: 'second-photo' }, { ...leaf }]
+const studyNodes = [{ ...root }, { ...a, name: 'Hidden taxon answer', photo: 'test-photo', bullets: ['Distinctive wing venation', 'Elbowed antennae', ''] }, { ...b, photo: 'second-photo' }, { ...leaf }]
 assert.deepEqual(flashcardDeck(studyNodes).map((n) => n.id), [a.id, b.id], 'Skip cards without photos')
 const shuffled = shuffleCards(flashcardDeck(studyNodes), () => 0)
 assert.deepEqual(shuffled.map((n) => n.id), [b.id, a.id])
@@ -107,6 +168,8 @@ try {
   const flash = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialChart: { ...chart, nodes: studyNodes }, initialPhotos: { 'test-photo': 'https://example.com/photo.png', 'second-photo': 'https://example.com/photo2.png' }, initialMode: 'flashcards' }))
   assert.ok(flash.includes('Flash cards') && flash.includes('Card 1 of 2'))
   assert.ok(flash.includes('Insect to identify') && flash.includes('Tap to reveal the name'))
+  assert.ok(flash.includes('Distinctive wing venation') && flash.includes('Elbowed antennae'), 'Identification details are visible before revealing the name')
+  assert.ok(!flash.includes('<li></li>'), 'Blank notes should not appear')
   assert.ok(!flash.includes('Hidden taxon answer'), 'The answer cannot leak in the initial flash card markup or image alt text')
   assert.ok(!flash.includes('tree-stage'), 'Flash cards replace the graph')
   const emptyStudy = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialMode: 'flashcards' }))
@@ -114,18 +177,25 @@ try {
   const view = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialMode: 'view' }))
   assert.ok(!edit.includes('Taxon editor') && !edit.includes('New bullet'), 'Edit mode starts without selecting a card')
   assert.ok(!edit.includes('More options') && !edit.includes('inline-options'))
-  assert.ok(edit.includes('Reorder Branch A'))
+  assert.ok(edit.includes('Unlock layout') && !edit.includes('Move Branch A and children'), 'Edit mode starts with node dragging locked')
+  assert.ok(!view.includes('Unlock layout'))
   assert.ok(!edit.includes('Add child to Insecta'))
   assert.ok(edit.includes('Add sibling to Branch A'))
   assert.ok(!edit.includes('inline-taxon') && !edit.includes('inline-inspector'))
   const { default: InlineTaxonCard } = await server.ssrLoadModule('/src/InlineTaxonCard.jsx')
   const inline = renderToStaticMarkup(createElement(InlineTaxonCard, { node: leaf, photos: {}, onChange() {}, onPhoto() {}, onDelete() {}, onClose() {}, onHeightChange() {} }))
   assert.ok(inline.includes('Taxon editor') && inline.includes('New bullet'))
+  assert.ok(inline.includes('Suborder (circle if untitled)') && !inline.includes('Redirect before this node'))
+  const routeProps = { ...props, initialChart: { ...chart, nodes: routed.nodes } }
+  const routeEdit = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'edit' }))
+  const routeView = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'view' }))
+  assert.ok(routeEdit.includes('Delete redirect') && routeEdit.includes('Add redirect on this branch'))
+  assert.ok(!routeView.includes('redirect-node') && !routeView.includes('Delete redirect') && !routeView.includes('Add redirect on this branch'))
   assert.ok(edit.includes('Add child to') && edit.includes('Add sibling to'))
   assert.ok(!edit.includes('canvas-add-tools'))
   assert.ok(edit.includes('Chart name') && edit.includes('aria-pressed="true"'))
   assert.ok(!edit.includes('layer-label') && !view.includes('layer-label'))
-  assert.ok(view.includes('Alignment') && view.includes('>Column</button>') && view.includes('>Graph</button>'))
+  assert.ok(!view.includes('Alignment') && !view.includes('>Graph</button>'))
   assert.ok(!edit.includes('editor-subbar') && !view.includes('editor-subbar'))
   assert.ok(view.includes('Chart mode') && !view.includes('Taxon editor') && !view.includes('New bullet'))
   console.log('PASS: tree validity, branch ordering, depth limits, non-overlapping horizontal layout, edit/view rendering, autosave reconciliation, cursor-centered wheel/pinch zoom, sibling-only ordering')

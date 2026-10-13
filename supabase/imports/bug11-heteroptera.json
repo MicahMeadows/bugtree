@@ -1,0 +1,595 @@
+{
+  "name": "Heteroptera",
+  "description": "",
+  "default_color": "sage",
+  "nodes": [
+    {
+      "id": "2950eca3-5cd2-4a58-83d5-cf9b5d475413",
+      "parentId": null,
+      "name": "Heteroptera",
+      "rank": "Suborder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "6484095f-b3a9-4d5f-95de-d3b5640f89bc",
+      "parentId": "2950eca3-5cd2-4a58-83d5-cf9b5d475413",
+      "name": "",
+      "rank": "Suborder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "suborder",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "f533c20b-3f75-44c8-9e3b-721c91be86cf",
+      "parentId": "6484095f-b3a9-4d5f-95de-d3b5640f89bc",
+      "name": "Enicocephalomorpha",
+      "rank": "Infraorder",
+      "bullets": [
+        "Head constricted transversely, divided into two lobes",
+        "Forewing uniform"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "053fef04-c07c-4a4a-bdcd-3fa9b955eedd",
+      "parentId": "6484095f-b3a9-4d5f-95de-d3b5640f89bc",
+      "name": "Gerromorpha",
+      "rank": "Infraorder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "d68c0ad5-3512-40b7-97ba-08510efb56ae",
+      "parentId": "053fef04-c07c-4a4a-bdcd-3fa9b955eedd",
+      "name": "Veliidae",
+      "rank": "Family",
+      "bullets": [
+        "Pronotum broader than abdomen",
+        "Mesocoxae midway between procoxae and metacoxae"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "22fb583f-58a3-4d75-9381-e12b914be539",
+      "parentId": "053fef04-c07c-4a4a-bdcd-3fa9b955eedd",
+      "name": "Gerridae",
+      "rank": "Family",
+      "bullets": [
+        "Mesocoxae closer to metacoxae than procoxae",
+        "Hind femur extends past abdomen"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "8e7b5573-cefe-4bf3-9802-d3f6ae994dcf",
+      "parentId": "2950eca3-5cd2-4a58-83d5-cf9b5d475413",
+      "name": "",
+      "rank": "Suborder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "suborder",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "3a1983aa-f56a-4d8b-95af-a640a1d878d3",
+      "parentId": "8e7b5573-cefe-4bf3-9802-d3f6ae994dcf",
+      "name": "Nepomorpha",
+      "rank": "Infraorder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "8c5bbae9-15db-41fc-b972-746178adf179",
+      "parentId": "3a1983aa-f56a-4d8b-95af-a640a1d878d3",
+      "name": "Gelastocoridae",
+      "rank": "Family",
+      "bullets": [
+        "Eyes large and mesally emarginated",
+        "Profemora enlarged"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "f332e854-e97c-4463-a5b5-c0b7cb5ad6b8",
+      "parentId": "3a1983aa-f56a-4d8b-95af-a640a1d878d3",
+      "name": "Belostomatidae",
+      "rank": "Family",
+      "bullets": [
+        "Reticulate venation",
+        "Last tergite modified, but not into a breathing tube"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "d1814943-83f8-4b90-b473-42fb018529c7",
+      "parentId": "3a1983aa-f56a-4d8b-95af-a640a1d878d3",
+      "name": "Nepidae",
+      "rank": "Family",
+      "bullets": [
+        "Last tergite modified into an elongate breathing tube"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "c56df4d4-318d-4a93-b2f7-e9a08a72eed6",
+      "parentId": "3a1983aa-f56a-4d8b-95af-a640a1d878d3",
+      "name": "Corixidae",
+      "rank": "Family",
+      "bullets": [
+        "Dark dorsally",
+        "Light ventrally"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "5e4b5dd3-8af8-483b-a3d9-c7d632ee2071",
+      "parentId": "3a1983aa-f56a-4d8b-95af-a640a1d878d3",
+      "name": "Notonectidae",
+      "rank": "Family",
+      "bullets": [
+        "Light dorsally",
+        "Dark ventrally"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "0caff62f-1817-4bb2-a391-245990e85d0b",
+      "parentId": "8e7b5573-cefe-4bf3-9802-d3f6ae994dcf",
+      "name": "",
+      "rank": "Suborder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "suborder",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "d6317f50-ae1b-4024-baab-7d57edb7502c",
+      "parentId": "0caff62f-1817-4bb2-a391-245990e85d0b",
+      "name": "Leptopodomorpha",
+      "rank": "Infraorder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "14772e6e-95ee-4974-8cfa-c28ad092f0d3",
+      "parentId": "d6317f50-ae1b-4024-baab-7d57edb7502c",
+      "name": "Saldidae",
+      "rank": "Family",
+      "bullets": [
+        "Large reniform eyes",
+        "Long labium reaching abdomen"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "153eaf25-2721-46b1-b3ab-020ee57f9bd3",
+      "parentId": "0caff62f-1817-4bb2-a391-245990e85d0b",
+      "name": "",
+      "rank": "Group",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "redirect",
+      "offsetX": 100,
+      "offsetY": 0
+    },
+    {
+      "id": "f31ad66f-3706-4aa6-8f36-ca351433ac14",
+      "parentId": "153eaf25-2721-46b1-b3ab-020ee57f9bd3",
+      "name": "Cimicomorpha",
+      "rank": "Infraorder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "fff83eef-1b97-4290-b8d5-22e2ec217bac",
+      "parentId": "f31ad66f-3706-4aa6-8f36-ca351433ac14",
+      "name": "Reduviidae",
+      "rank": "Family",
+      "bullets": [
+        "“Neck”",
+        "3-segmented beak",
+        "4-segmented antennae"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "44970230-bcd8-4b3b-946d-4648b1af01bc",
+      "parentId": "f31ad66f-3706-4aa6-8f36-ca351433ac14",
+      "name": "Naboidea",
+      "rank": "Superfamily",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "df7c0856-f366-43be-a34b-ca244a0170fe",
+      "parentId": "44970230-bcd8-4b3b-946d-4648b1af01bc",
+      "name": "Nabidae",
+      "rank": "Family",
+      "bullets": [
+        "No prosternal stridulatory groove",
+        "2–3 elongate cells, many emanating veins"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "babe0187-2e63-4e4c-b3ff-2680aff96295",
+      "parentId": "f31ad66f-3706-4aa6-8f36-ca351433ac14",
+      "name": "Miroidea",
+      "rank": "Superfamily",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "d03d29d2-64ff-4934-86b0-05b5f545d547",
+      "parentId": "babe0187-2e63-4e4c-b3ff-2680aff96295",
+      "name": "Miridae",
+      "rank": "Family",
+      "bullets": [
+        "4-segmented beak",
+        "Forewing with costal fracture/cuneus",
+        "Ocelli absent"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "60e37ee6-0834-4693-b16f-83c5d678dc89",
+      "parentId": "babe0187-2e63-4e4c-b3ff-2680aff96295",
+      "name": "Tingidae",
+      "rank": "Family",
+      "bullets": [
+        "Heavily punctate to areolate"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "3386c575-ca5a-4c97-973e-11e9738ff6f5",
+      "parentId": "153eaf25-2721-46b1-b3ab-020ee57f9bd3",
+      "name": "Pentatomorpha",
+      "rank": "Infraorder",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "2a18dc8d-474e-4587-a043-0c0432e4ec79",
+      "parentId": "3386c575-ca5a-4c97-973e-11e9738ff6f5",
+      "name": "Aradoidea",
+      "rank": "Superfamily",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "420ffb78-2865-411c-8509-e8084f6a57af",
+      "parentId": "2a18dc8d-474e-4587-a043-0c0432e4ec79",
+      "name": "Aradidae",
+      "rank": "Family",
+      "bullets": [
+        "Dorsoventrally flattened, oval"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "075716c8-a788-4453-87d3-12ce5267a8b5",
+      "parentId": "3386c575-ca5a-4c97-973e-11e9738ff6f5",
+      "name": "Pentatomoidea",
+      "rank": "Superfamily",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "93b76bbe-337e-4c23-9494-b0ae85c2bff1",
+      "parentId": "075716c8-a788-4453-87d3-12ce5267a8b5",
+      "name": "Pentatomidae",
+      "rank": "Family",
+      "bullets": [
+        "Scutellum large and triangular"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "26d321e0-c3b9-4dc8-bb1e-8d88c6c72a96",
+      "parentId": "075716c8-a788-4453-87d3-12ce5267a8b5",
+      "name": "Scutelleridae",
+      "rank": "Family",
+      "bullets": [
+        "Scutellum covers most of abdomen"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "94867106-e408-48c7-92a8-88cd8e25eb7b",
+      "parentId": "075716c8-a788-4453-87d3-12ce5267a8b5",
+      "name": "Cydnidae",
+      "rank": "Family",
+      "bullets": [
+        "Large scutellum, often triangular",
+        "Spiny fossorial legs"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "1198003f-f13b-4ee3-b0f4-771be5d34e35",
+      "parentId": "075716c8-a788-4453-87d3-12ce5267a8b5",
+      "name": "Thyreocoridae",
+      "rank": "Family",
+      "bullets": [
+        "Large rounded scutellum covering most of abdomen"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "9d60c9ac-8bcb-46bb-885f-88d2a41afd32",
+      "parentId": "3386c575-ca5a-4c97-973e-11e9738ff6f5",
+      "name": "Lygaeoidea",
+      "rank": "Superfamily",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "025208aa-5d42-493c-92f1-ece4ae4c2388",
+      "parentId": "9d60c9ac-8bcb-46bb-885f-88d2a41afd32",
+      "name": "Lygaeidae",
+      "rank": "Family",
+      "bullets": [
+        "4 or 5 veins in membrane",
+        "4-segmented beak and antennae"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "b3fc158a-ff3b-46a1-a850-c4684d0583be",
+      "parentId": "9d60c9ac-8bcb-46bb-885f-88d2a41afd32",
+      "name": "Rhyparochromidae",
+      "rank": "Family",
+      "bullets": [
+        "Profemora typically thickened and spined",
+        "Suture between sterna 4 and 5 fused"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "de17e572-1bde-4154-a850-cd9cf962a73d",
+      "parentId": "9d60c9ac-8bcb-46bb-885f-88d2a41afd32",
+      "name": "Berytidae",
+      "rank": "Family",
+      "bullets": [
+        "Antennomere 4 short/swollen",
+        "Antennomere 1 elongate and swollen"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "f07144e5-a0f0-446b-8812-4460d27ffedd",
+      "parentId": "3386c575-ca5a-4c97-973e-11e9738ff6f5",
+      "name": "Coreoidea",
+      "rank": "Superfamily",
+      "bullets": [],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "051263be-2d36-49a2-b696-cf0c8201d976",
+      "parentId": "f07144e5-a0f0-446b-8812-4460d27ffedd",
+      "name": "Coreidae",
+      "rank": "Family",
+      "bullets": [
+        "Forewing with many veins (15–20 parallel)",
+        "Ocelli present"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "1b9bcac3-d3d5-4332-b5e3-945abc44c46b",
+      "parentId": "f07144e5-a0f0-446b-8812-4460d27ffedd",
+      "name": "Alydidae",
+      "rank": "Family",
+      "bullets": [
+        "Head/eyes usually as wide as any other point on body",
+        "Numerous veins"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    {
+      "id": "9d15e1ee-cdb3-4eae-9374-d8fffc6c6c83",
+      "parentId": "f07144e5-a0f0-446b-8812-4460d27ffedd",
+      "name": "Rhopalidae",
+      "rank": "Family",
+      "bullets": [
+        "Antennae arise from tubercles, not dilated",
+        "Numerous veins"
+      ],
+      "photo": "",
+      "photoAlt": "",
+      "color": "sage",
+      "type": "taxon",
+      "offsetX": 0,
+      "offsetY": 0
+    }
+  ]
+}

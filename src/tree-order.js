@@ -23,6 +23,6 @@ export function siblingDrop(items, id, worldY) {
   return { index, y, x: node.x, width: node.width }
 }
 
-export function isDefaultTaxon(node) {
-  return node.name === 'New taxon' && ['Group', 'Order', 'Family'].includes(node.rank) && node.color === 'lavender' && node.bullets.length === 0 && !node.photo && !node.photoAlt
+export function isDefaultTaxon(node, defaultColor = 'lavender') {
+  return node.name === 'New taxon' && ['Group', 'Order', 'Family'].includes(node.rank) && node.color === defaultColor && node.bullets.length === 0 && !node.photo && !node.photoAlt
 }

@@ -1,4 +1,4 @@
-import { newNode, validateNodes } from './tree-model.js'
+import { newNode, validateNodes, COLORS } from './tree-model.js'
 import { createClient } from 'npm:@supabase/supabase-js@2.117.3'
 
 const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
       check(result.error)
       return reply({ ok: true })
     }
-    const chartColumns = 'id,name,description,nodes,node_count,version,created_at,updated_at'
+    const chartColumns = 'id,name,description,default_color,nodes,node_count,version,created_at,updated_at'
     const validId = (id: unknown) => typeof id === 'string' && /^[a-f0-9-]{36}$/.test(id)
     if (body.action === 'charts-list') {
       const result = await db.from('taxonomy_charts').select('id,name,description,node_count,version,updated_at').is('deleted_at', null).order('updated_at', { ascending: false })
@@ -82,12 +82,14 @@ Deno.serve(async (req) => {
     if (body.action === 'chart-load') return reply({ data: existing.data, photoUrls: await signPhotos(existing.data.nodes.map((n: { photo: string }) => n.photo).filter(Boolean)) })
     if (body.action === 'chart-save') {
       if (typeof body.name !== 'string' || !body.name.trim() || body.name.length > 200 || typeof body.description !== 'string' || body.description.length > 2000) return reply({ error: 'Check your chart name and description.' }, 400)
+      const defaultColor = body.default_color === undefined ? existing.data.default_color : body.default_color
+      if (!COLORS.includes(defaultColor)) return reply({ error: 'Invalid default color.' }, 400)
       const invalid = validateNodes(body.nodes, body.id)
       if (invalid) return reply({ error: invalid }, 400)
       if (JSON.stringify(body.nodes).length > 1000000) return reply({ error: 'This chart is too large. Shorten its notes or split it into two trees.' }, 400)
       if (!Number.isInteger(body.version) || body.version < 1) return reply({ error: 'Invalid chart version' }, 400)
-      const nodes = body.nodes.map((n: any) => ({ id: n.id, parentId: n.parentId, name: n.name.trim(), rank: n.rank, bullets: n.bullets, photo: n.photo, photoAlt: n.photoAlt, color: n.color }))
-      const result = await db.from('taxonomy_charts').update({ name: body.name.trim(), description: body.description, nodes, version: body.version + 1, updated_at: new Date().toISOString() }).eq('id', body.id).eq('version', body.version).is('deleted_at', null).select(chartColumns).maybeSingle()
+      const nodes = body.nodes.map((n: any) => ({ id: n.id, parentId: n.parentId, name: n.name.trim(), rank: n.rank, bullets: n.bullets, photo: n.photo, photoAlt: n.photoAlt, color: n.color, type: n.type || 'taxon', offsetX: n.offsetX || 0, offsetY: n.offsetY || 0 }))
+      const result = await db.from('taxonomy_charts').update({ name: body.name.trim(), description: body.description, default_color: defaultColor, nodes, version: body.version + 1, updated_at: new Date().toISOString() }).eq('id', body.id).eq('version', body.version).is('deleted_at', null).select(chartColumns).maybeSingle()
       check(result.error)
       if (!result.data) return reply({ error: 'This chart changed in another tab. Your edits are still here; export a backup, then reopen the chart before saving.' }, 409)
       return reply({ data: result.data })

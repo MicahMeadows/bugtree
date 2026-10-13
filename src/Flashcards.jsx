@@ -36,6 +36,7 @@ export default function Flashcards({ nodes, photos, onEdit }) {
     <div className="flashcards-progress" aria-hidden="true"><span style={{ width: `${(index + 1) / deck.length * 100}%` }} /></div>
     <button className={`flashcard ${revealed ? 'revealed' : ''}`} aria-label={revealed ? 'Next flash card' : 'Reveal insect name'} aria-pressed={revealed} onClick={() => { if (revealed) move(1); else setRevealed(true) }}>
       <div className="flashcard-image">{photo && !imageFailed ? <img src={photo} alt="Insect to identify" draggable={false} onError={() => setImageFailed(true)} /> : <div className="flashcard-missing"><Icon name="image" size={40} /><span>Photo unavailable</span></div>}</div>
+      {card.bullets.some((note) => note.trim()) && <ul className="flashcard-details">{card.bullets.filter((note) => note.trim()).map((note, index) => <li key={index}>{note}</li>)}</ul>}
       <div className="flashcard-answer" aria-live="polite">{revealed ? <h2>{card.name}</h2> : <span>Tap to reveal the name</span>}</div>
     </button>
     <div className="flashcards-navigation"><button className="secondary" onClick={() => move(-1)} disabled={deck.length < 2}><Icon name="back" size={16} /> Previous</button></div>

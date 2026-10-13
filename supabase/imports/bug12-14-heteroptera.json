@@ -1,0 +1,277 @@
+{
+  "tree": "Heteroptera",
+  "sourceImages": [
+    "bug12.png",
+    "bug13.png",
+    "bug14.png"
+  ],
+  "cards": [
+    {
+      "name": "Pentatomidae",
+      "source": "bug12.png",
+      "crop": [
+        394,
+        30,
+        174,
+        125
+      ],
+      "bullets": [
+        "Scutellum large and triangular"
+      ],
+      "photoAlt": "Pentatomidae"
+    },
+    {
+      "name": "Scutelleridae",
+      "source": "bug12.png",
+      "crop": [
+        395,
+        190,
+        174,
+        129
+      ],
+      "bullets": [
+        "Scutellum covers most of abdomen"
+      ],
+      "photoAlt": "Scutelleridae"
+    },
+    {
+      "name": "Cydnidae",
+      "source": "bug12.png",
+      "crop": [
+        397,
+        351,
+        168,
+        128
+      ],
+      "bullets": [
+        "Large scutellum, often triangular",
+        "Spiny fossorial legs"
+      ],
+      "photoAlt": "Cydnidae"
+    },
+    {
+      "name": "Thyreocoridae",
+      "source": "bug12.png",
+      "crop": [
+        395,
+        513,
+        173,
+        127
+      ],
+      "bullets": [
+        "Large rounded scutellum covering most of abdomen"
+      ],
+      "photoAlt": "Thyreocoridae"
+    },
+    {
+      "name": "Reduviidae",
+      "source": "bug13.png",
+      "crop": [
+        397,
+        48,
+        173,
+        115
+      ],
+      "bullets": [
+        "“Neck”",
+        "3-segmented beak",
+        "4-segmented antennae"
+      ],
+      "photoAlt": "Reduviidae — Arilus cristatus"
+    },
+    {
+      "name": "Nabidae",
+      "source": "bug13.png",
+      "crop": [
+        397,
+        209,
+        174,
+        116
+      ],
+      "bullets": [
+        "No prosternal stridulatory groove",
+        "2–3 elongate cells, many emanating veins"
+      ],
+      "photoAlt": "Nabidae"
+    },
+    {
+      "name": "Miridae",
+      "source": "bug13.png",
+      "crop": [
+        397,
+        371,
+        173,
+        115
+      ],
+      "bullets": [
+        "4-segmented beak",
+        "Forewing with costal fracture/cuneus",
+        "Ocelli absent"
+      ],
+      "photoAlt": "Miridae"
+    },
+    {
+      "name": "Tingidae",
+      "source": "bug13.png",
+      "crop": [
+        421,
+        528,
+        156,
+        126
+      ],
+      "bullets": [
+        "Heavily punctate to areolate"
+      ],
+      "photoAlt": "Tingidae"
+    },
+    {
+      "name": "Aradidae",
+      "source": "bug13.png",
+      "crop": [
+        396,
+        742,
+        175,
+        117
+      ],
+      "bullets": [
+        "Dorsoventrally flattened, oval"
+      ],
+      "photoAlt": "Aradidae"
+    },
+    {
+      "name": "Enicocephalomorpha",
+      "source": "bug14.png",
+      "crop": [
+        217,
+        38,
+        174,
+        128
+      ],
+      "bullets": [
+        "Head constricted transversely, divided into two lobes",
+        "Forewing uniform"
+      ],
+      "photoAlt": "Enicocephalomorpha — Systelloderes spp."
+    },
+    {
+      "name": "Veliidae",
+      "source": "bug14.png",
+      "crop": [
+        240,
+        230,
+        129,
+        126
+      ],
+      "bullets": [
+        "Pronotum broader than abdomen",
+        "Mesocoxae midway between procoxae and metacoxae"
+      ],
+      "photoAlt": "Veliidae"
+    },
+    {
+      "name": "Gerridae",
+      "source": "bug14.png",
+      "crop": [
+        239,
+        390,
+        129,
+        129
+      ],
+      "bullets": [
+        "Mesocoxae closer to metacoxae than procoxae",
+        "Hind femur extends past abdomen",
+        "Some apterous (wingless)"
+      ],
+      "photoAlt": "Gerridae — Some apterous (wingless)"
+    },
+    {
+      "name": "Gelastocoridae",
+      "source": "bug14.png",
+      "crop": [
+        237,
+        587,
+        154,
+        128
+      ],
+      "bullets": [
+        "Eyes large and mesally emarginated",
+        "Profemora enlarged"
+      ],
+      "photoAlt": "Gelastocoridae"
+    },
+    {
+      "name": "Belostomatidae",
+      "source": "bug14.png",
+      "crop": [
+        224,
+        749,
+        167,
+        129
+      ],
+      "bullets": [
+        "Reticulate venation",
+        "Last tergite modified, but not into a breathing tube"
+      ],
+      "photoAlt": "Belostomatidae — Lethocerus"
+    },
+    {
+      "name": "Nepidae",
+      "source": "bug14.png",
+      "crop": [
+        217,
+        915,
+        174,
+        116
+      ],
+      "bullets": [
+        "Last tergite modified into an elongate breathing tube"
+      ],
+      "photoAlt": "Nepidae — Ranatra and Nepa"
+    },
+    {
+      "name": "Corixidae",
+      "source": "bug14.png",
+      "crop": [
+        232,
+        1070,
+        145,
+        130
+      ],
+      "bullets": [
+        "Dark dorsally",
+        "Light ventrally"
+      ],
+      "photoAlt": "Corixidae"
+    },
+    {
+      "name": "Notonectidae",
+      "source": "bug14.png",
+      "crop": [
+        220,
+        1233,
+        170,
+        124
+      ],
+      "bullets": [
+        "Light dorsally",
+        "Dark ventrally"
+      ],
+      "photoAlt": "Notonectidae"
+    },
+    {
+      "name": "Saldidae",
+      "source": "bug14.png",
+      "crop": [
+        216,
+        1440,
+        174,
+        130
+      ],
+      "bullets": [
+        "Large reniform eyes",
+        "Long labium reaching abdomen"
+      ],
+      "photoAlt": "Saldidae"
+    }
+  ]
+}

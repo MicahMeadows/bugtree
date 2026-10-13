@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { siteApi } from './supabase'
 import { AUTOSAVE_DELAY, AUTOSAVE_RETRY_DELAY, reconcileSave } from './autosave'
-import { newNode, descendants, validateNodes, MAX_NODES } from '../supabase/functions/site-api/tree-model'
+import { newNode, descendants, validateNodes, MAX_NODES, COLORS } from '../supabase/functions/site-api/tree-model'
 import { layoutTree } from './tree-layout'
-import { moveSibling, isDefaultTaxon } from './tree-order'
+import { insertRedirectAt, removeRedirect as unwrapRedirect, moveBranch } from './tree-routing'
+import { isDefaultTaxon } from './tree-order'
 import { Beetle, Icon } from './Icons'
 import TreeCanvas from './TreeCanvas'
 import InlineTaxonCard from './InlineTaxonCard'
@@ -40,6 +41,7 @@ export default function TreeEditor({ initialChart, initialPhotos, initialMode, o
   const [saveFailure, setSaveFailure] = useState(null)
   const [error, setError] = useState('')
   const [history, setHistory] = useState([])
+  const [deletingRedirect, setDeletingRedirect] = useState(null)
   const [deletingNode, setDeletingNode] = useState(null)
   const chartRef = useRef(chart)
   const locked = useRef(false)
@@ -87,13 +89,22 @@ export default function TreeEditor({ initialChart, initialPhotos, initialMode, o
   function add(parentId) {
     if (chart.nodes.length >= MAX_NODES) { setError('This tree has 200 taxa. Start another chart to keep it manageable.'); return }
     const parent = chart.nodes.find((n) => n.id === parentId)
-    const node = newNode(parentId, 'New taxon', parent?.rank === 'Class' ? 'Order' : parent?.rank === 'Order' ? 'Family' : 'Group')
+    const node = newNode(parentId, 'New taxon', parent?.rank === 'Class' ? 'Order' : parent?.rank === 'Order' ? 'Family' : 'Group', chart.default_color || 'lavender')
     if (change({ nodes: [...chart.nodes, node] }, true)) setSelectedId(node.id)
+  }
+  function addRedirect(id, point, currentLayout) {
+    const result = insertRedirectAt(chart.nodes, id, chart.default_color || 'lavender', point, currentLayout)
+    if (result) change({ nodes: result.nodes }, true)
+  }
+  function confirmRemoveRedirect() {
+    const next = unwrapRedirect(chart.nodes, deletingRedirect)
+    if (next !== chart.nodes && !change({ nodes: next }, true)) throw new Error('Could not remove this redirect.')
+    if (selectedId === deletingRedirect) setSelectedId(null)
   }
   function deleteBranch() {
     if (!selected || selected.parentId === null || busy) return
     const count = descendants(chart.nodes, selected.id).size
-    setDeletingNode({ id: selected.id, name: selected.name.trim(), count, requireName: count > 1 || !isDefaultTaxon(selected) })
+    setDeletingNode({ id: selected.id, name: selected.name.trim() || (selected.type === 'redirect' ? 'Redirect' : 'Suborder'), count, requireName: Boolean(selected.name.trim()) && (count > 1 || !isDefaultTaxon(selected, chart.default_color || 'lavender')) })
   }
   function confirmDeleteBranch() {
     const target = chart.nodes.find((n) => n.id === deletingNode.id)
@@ -120,7 +131,7 @@ export default function TreeEditor({ initialChart, initialPhotos, initialMode, o
     locked.current = true; setSaving(true); if (!automatic) setBusy(true)
     setError('')
     try {
-      const result = await siteApi('chart-save', { id: snapshot.id, name: snapshot.name, description: snapshot.description, nodes: snapshot.nodes, version: snapshot.version })
+      const result = await siteApi('chart-save', { id: snapshot.id, name: snapshot.name, description: snapshot.description, default_color: snapshot.default_color || 'lavender', nodes: snapshot.nodes, version: snapshot.version })
       const next = reconcileSave(snapshot, chartRef.current, result.data)
       chartRef.current = next.chart
       setChart(next.chart); setDirty(next.dirty); setSaveFailure(null)
@@ -161,11 +172,12 @@ export default function TreeEditor({ initialChart, initialPhotos, initialMode, o
     } catch (error) { fail(error) } finally { locked.current = false; setBusy(false) }
   }
   return <main className="editor-page">
-    <header className="editor-header"><button className="back-button" onClick={back} disabled={busy || saving} title="Save and return to your trees"><Icon name="back" /><span>My trees</span></button><div className="editor-brand"><Beetle size={24} /></div><div className="chart-title">{mode === 'edit' ? <input aria-label="Chart name" value={chart.name} onChange={(e) => change({ name: e.target.value })} disabled={busy} maxLength={200} /> : <h1>{chart.name}</h1>}<span>{chart.nodes.length} taxa · {layout.layers.length} {layout.layers.length === 1 ? 'layer' : 'layers'}<span className={`save-state ${dirty ? 'unsaved' : ''}`} role="status">{saving ? 'Saving…' : busy ? 'Uploading…' : dirty ? (saveFailure ? 'Not saved' : 'Waiting to save…') : 'Saved'}</span></span></div><div className="editor-actions">{mode === 'edit' && <><button className="icon-button" title="Undo last edit" aria-label="Undo last edit" onClick={undo} disabled={busy || !history.length}><Icon name="undo" /></button><button className="primary save-button" onClick={() => save()} disabled={busy || saving || !dirty}><Icon name="save" size={16} /> Save</button></>}<div className="mode-toggle" aria-label="Chart mode"><button aria-pressed={mode === 'edit'} className={mode === 'edit' ? 'active' : ''} onClick={() => changeMode('edit')} disabled={busy || saving}><Icon name="edit" size={15} /> Edit</button><button aria-pressed={mode === 'view'} className={mode === 'view' ? 'active' : ''} onClick={() => changeMode('view')} disabled={busy || saving}><Icon name="eye" size={15} /> View</button><button aria-pressed={mode === 'flashcards'} className={mode === 'flashcards' ? 'active' : ''} onClick={() => changeMode('flashcards')} disabled={busy || saving}><Icon name="cards" size={15} /> Flash cards</button></div></div></header>
+    <header className="editor-header"><button className="back-button" onClick={back} disabled={busy || saving} title="Save and return to your trees"><Icon name="back" /><span>My trees</span></button><div className="editor-brand"><Beetle size={24} /></div><div className="chart-title">{mode === 'edit' ? <input aria-label="Chart name" value={chart.name} onChange={(e) => change({ name: e.target.value })} disabled={busy} maxLength={200} /> : <h1>{chart.name}</h1>}<span>{chart.nodes.length} taxa · {layout.layers.length} {layout.layers.length === 1 ? 'layer' : 'layers'}<span className={`save-state ${dirty ? 'unsaved' : ''}`} role="status">{saving ? 'Saving…' : busy ? 'Uploading…' : dirty ? (saveFailure ? 'Not saved' : 'Waiting to save…') : 'Saved'}</span></span></div><div className="editor-actions">{mode === 'edit' && <><div className="tree-default-color"><span>Default color</span><div className="color-options" role="group" aria-label="Tree default color">{COLORS.map((color) => <button key={color} type="button" className={`color-swatch ${color} ${(chart.default_color || 'lavender') === color ? 'chosen' : ''}`} aria-label={`${color} default color`} title={color} aria-pressed={(chart.default_color || 'lavender') === color} disabled={busy} onClick={() => change({ default_color: color })}>{(chart.default_color || 'lavender') === color ? '✓' : ''}</button>)}</div></div><button className="icon-button" title="Undo last edit" aria-label="Undo last edit" onClick={undo} disabled={busy || !history.length}><Icon name="undo" /></button><button className="primary save-button" onClick={() => save()} disabled={busy || saving || !dirty}><Icon name="save" size={16} /> Save</button></>}<div className="mode-toggle" aria-label="Chart mode"><button aria-pressed={mode === 'edit'} className={mode === 'edit' ? 'active' : ''} onClick={() => changeMode('edit')} disabled={busy || saving}><Icon name="edit" size={15} /> Edit</button><button aria-pressed={mode === 'view'} className={mode === 'view' ? 'active' : ''} onClick={() => changeMode('view')} disabled={busy || saving}><Icon name="eye" size={15} /> View</button><button aria-pressed={mode === 'flashcards'} className={mode === 'flashcards' ? 'active' : ''} onClick={() => changeMode('flashcards')} disabled={busy || saving}><Icon name="cards" size={15} /> Flash cards</button></div></div></header>
     {error && <div className="editor-error error" role="alert"><span>{error}</span><div>{dirty && <button className="text-button" onClick={discardAndBack} disabled={busy || saving}>Discard & return</button>}<button className="icon-button" aria-label="Dismiss error" onClick={() => setError('')}><Icon name="close" size={16} /></button></div></div>}
     <div className="editor-workspace">
-      {mode === 'flashcards' ? <Flashcards nodes={chart.nodes} photos={photos} onEdit={() => changeMode('edit')} /> : <TreeCanvas nodes={chart.nodes} photos={photos} selectedId={selectedId} onSelect={setSelectedId} mode={mode} busy={busy} onReorder={(id, index) => { const next = moveSibling(chart.nodes, id, index); if (next !== chart.nodes) change({ nodes: next }, true) }} onAddChild={(id) => add(id)} onAddSibling={(id) => { const parentId = chart.nodes.find((n) => n.id === id)?.parentId; if (parentId) add(parentId) }} renderEditor={(onHeightChange) => selected && <InlineTaxonCard node={selected} photos={photos} busy={busy} photoBusy={saving} onChange={updateNode} onPhoto={upload} onDelete={deleteBranch} onClose={() => setSelectedId(null)} onHeightChange={onHeightChange} />} />}
+      {mode === 'flashcards' ? <Flashcards nodes={chart.nodes} photos={photos} onEdit={() => changeMode('edit')} /> : <TreeCanvas nodes={chart.nodes} photos={photos} selectedId={selectedId} onSelect={setSelectedId} mode={mode} busy={busy} onAddRedirect={addRedirect} onDeleteRedirect={setDeletingRedirect} onMoveNode={(id, dx, dy) => change({ nodes: moveBranch(chart.nodes, id, dx, dy) }, true)} onAddChild={(id) => add(id)} onAddSibling={(id) => { const parentId = chart.nodes.find((n) => n.id === id)?.parentId; if (parentId) add(parentId) }} renderEditor={(onHeightChange) => selected && <InlineTaxonCard node={selected} photos={photos} busy={busy} photoBusy={saving} onChange={updateNode} onPhoto={upload} onDelete={deleteBranch} onClose={() => setSelectedId(null)} onHeightChange={onHeightChange} />} />}
     </div>
+    {deletingRedirect && <DeleteDialog name="Redirect" kind="redirect" requireName={false} description="Remove this routing point? Its child nodes and their positions will be kept. You can undo this change." onConfirm={confirmRemoveRedirect} onCancel={() => setDeletingRedirect(null)} />}
     {deletingNode && <DeleteDialog name={deletingNode.name} requireName={deletingNode.requireName} kind="branch" description={deletingNode.count > 1 ? `This deletes the card and its ${deletingNode.count - 1} descendant taxa. You can undo it while this chart is open.` : 'This deletes the card. You can undo it while this chart is open.'} onConfirm={confirmDeleteBranch} onCancel={() => setDeletingNode(null)} />}
   </main>
 }

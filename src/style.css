@@ -282,18 +282,14 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .inline-title { padding-right: 51px; }
 .reordering-card { z-index: 10; opacity: .85; cursor: grabbing; box-shadow: 0 12px 24px #70517b33; }
 .sibling-drop-line { position: absolute; height: 3px; border-radius: 4px; background: #a275be; z-index: 9; pointer-events: none; box-shadow: 0 0 0 3px #fff9edcc; }
-.inline-card-footer { display: flex; justify-content: flex-end; padding-top: 2px; }
+.inline-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 2px 4px; }
 .inline-card-footer .icon-button { width: 24px; height: 24px; }
 
 .canvas-pattern { position: absolute; inset: 0; pointer-events: none; background-repeat: repeat; }
 
-.layout-toggle { display: flex; gap: 3px; background: #efe0f5; border-radius: 9px; padding: 3px; }
-.layout-toggle button { padding: 6px 9px; font-size: 11px; color: #9779a6; border-radius: 7px; }
-.layout-toggle button.active { background: #fff9ed; color: #76548b; box-shadow: 0 1px 3px #76548b22; }
 .bugtree-icon { object-fit: contain; flex-shrink: 0; }
-@media (max-width: 400px) { .canvas-controls { gap: 2px; left: 8px; }.layout-toggle button { padding: 6px; }.canvas-controls .icon-button { width: 28px; } }
+@media (max-width: 400px) { .canvas-controls { gap: 2px; left: 8px; }.canvas-controls .icon-button { width: 28px; } }
 
-.canvas-controls .alignment-label { min-width: 0; font-size: 10px; margin-left: 5px; color: #9779a6; }
 @media (max-width: 420px) { .canvas-controls { flex-wrap: wrap; max-width: calc(100% - 28px); } }
 
 .flashcards { flex: 1; min-width: 0; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 28px 24px 36px; background: #fffaf1; }
@@ -304,6 +300,8 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .flashcard:hover { border-color: #b996cc; }
 .flashcard-image { display: flex; align-items: center; justify-content: center; width: 100%; height: clamp(180px, 44vh, 430px); background: #fff; border-radius: 11px; overflow: hidden; }
 .flashcard-image img { width: 100%; height: 100%; object-fit: contain; user-select: none; }
+.flashcard-details { width: 100%; margin: 18px 0 0; padding: 0 14px 0 30px; text-align: left; font-size: 15px; line-height: 1.5; font-weight: 400; overflow-wrap: anywhere; }
+.flashcard-details li + li { margin-top: 6px; }
 .flashcard-missing { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #b29ac0; font-weight: 400; }
 .flashcard-answer { min-height: 92px; display: flex; align-items: center; justify-content: center; padding: 18px 12px 6px; width: 100%; }
 .flashcard-answer > span { color: #a18aad; font-size: 13px; font-weight: 400; }
@@ -317,3 +315,34 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 
 /* Welcome uses the same neutral surfaces as the tree library. */
 .login-card { background: #fffaf1; border: 0; border-radius: 0; box-shadow: none; padding-bottom: 30px; }
+
+.inline-card-footer .color-options { gap: 8px; }
+.inline-card-footer .color-swatch { width: 22px; height: 22px; font-size: 10px; }
+
+.tree-default-color { display: flex; flex-direction: column; gap: 5px; margin-right: 8px; }
+.tree-default-color > span { font-size: 11px; color: var(--muted); }
+.tree-default-color .color-options { gap: 6px; }
+.tree-default-color .color-swatch { width: 22px; height: 22px; }
+
+.circle-node { border-radius: 50%; padding: 0; background: var(--node-color); border-color: var(--node-border); overflow: visible; }
+.circle-node .card-drag-handle { display: none; }
+.redirect-node.circle-node { border-style: dashed; cursor: grab; }
+.node-type-control { display: flex; align-items: center; gap: 8px; padding: 10px 4px 2px; font-size: 12px; }
+.node-type-control select { flex: 1; min-width: 0; padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: #fffaf1; color: inherit; }
+.redirect-tools { display: flex; flex-direction: column; gap: 10px; padding: 12px 4px; font-size: 12px; }
+
+.redirect-node.circle-node { background: transparent; box-shadow: none; border: 2px dashed #838584; overflow: visible; }
+.redirect-delete { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: transparent; color: #875779; border: 0; line-height: 1; font-size: 16px; opacity: 0; pointer-events: none; }
+.redirect-node:hover .redirect-delete, .redirect-node:focus-within .redirect-delete { opacity: 1; pointer-events: auto; }
+.connector-hit-area { pointer-events: stroke; cursor: crosshair; }
+.connector-hit-area:hover, .connector-hit-area:focus { stroke: #a17abb30; outline: none; }
+
+.tree-connections { overflow: visible; }
+
+.column-mode-toggle { padding: 6px 10px; border-radius: 7px; font-size: 12px; color: #76548b; }
+.column-mode-toggle.active { background: #eadbf6; box-shadow: inset 0 0 0 1px #c7b1dd; }
+
+.layout-lock-toggle { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-radius: 7px; font-size: 12px; color: #76548b; }
+.layout-lock-toggle.active { background: #eadbf6; }
+.redirect-node.circle-node { cursor: pointer; }
+.redirect-node.circle-node.draggable { cursor: grab; }

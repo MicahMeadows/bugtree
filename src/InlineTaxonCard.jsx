@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Icon } from './Icons'
+import { COLORS } from '../supabase/functions/site-api/tree-model'
 
 function Bullet({ value, index, busy, onChange, onDelete }) {
   const input = useRef(null)
@@ -19,9 +20,10 @@ export default function InlineTaxonCard({ node, photos, busy, photoBusy, onChang
   return <div ref={container} className="inline-taxon" data-card-editor aria-label="Taxon editor">
     <div className="inline-title taxon-label">
       {node.rank && node.rank.toLowerCase() !== 'group' && <span>{node.rank}</span>}
-      <input aria-label="Taxon name" title="Click to edit title" value={node.name} maxLength={200} disabled={busy} onChange={(e) => onChange({ name: e.target.value })} placeholder="Taxon name" />
+      <input aria-label="Taxon name" title="Click to edit title" value={node.name} maxLength={200} disabled={busy} onChange={(e) => onChange({ name: e.target.value })} placeholder={node.type === 'redirect' ? 'Redirect (optional)' : 'Taxon name'} />
       <button className="inline-done icon-button" title="Finish editing" aria-label="Finish editing card" onClick={onClose}><Icon name="close" size={14} /></button>
     </div>
+    <label className="node-type-control">Type<select aria-label="Node type" value={node.type === 'suborder' || node.rank === 'Suborder' ? 'suborder' : 'taxon'} disabled={busy} onChange={(e) => onChange({ type: e.target.value, rank: e.target.value === 'suborder' ? 'Suborder' : (node.rank === 'Suborder' ? 'Group' : node.rank) })}><option value="taxon">Taxon</option><option value="suborder">Suborder (circle if untitled)</option></select></label>
     <div className="inline-card-content">
       <div className="inline-notes">
         {node.bullets.map((bullet, i) => <Bullet key={i} value={bullet} index={i} busy={busy} onChange={(value) => onChange({ bullets: node.bullets.map((b, j) => j === i ? value : b) })} onDelete={() => onChange({ bullets: node.bullets.filter((_, j) => j !== i) })} />)}
@@ -33,6 +35,9 @@ export default function InlineTaxonCard({ node, photos, busy, photoBusy, onChang
         {node.photo && <span className="photo-edit-overlay"><Icon name="edit" size={14} /></span>}
       </label>
     </div>
-    {node.parentId !== null && <div className="inline-card-footer"><button className="icon-button danger" disabled={busy} aria-label={`Delete ${node.name}`} title="Delete card & branch" onClick={onDelete}><Icon name="trash" size={14} /></button></div>}
+    <div className="inline-card-footer">
+      <div className="color-options" role="group" aria-label="Label color">{COLORS.map((color) => <button key={color} type="button" className={`color-swatch ${color} ${node.color === color ? 'chosen' : ''}`} aria-label={`${color} label`} title={color} aria-pressed={node.color === color} disabled={busy} onClick={() => onChange({ color })}>{node.color === color ? '✓' : ''}</button>)}</div>
+      {node.parentId !== null && <button className="icon-button danger" disabled={busy} aria-label={`Delete ${node.name}`} title="Delete card & branch" onClick={onDelete}><Icon name="trash" size={14} /></button>}
+    </div>
   </div>
 }
