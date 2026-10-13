@@ -295,3 +295,22 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 
 .canvas-controls .alignment-label { min-width: 0; font-size: 10px; margin-left: 5px; color: #9779a6; }
 @media (max-width: 420px) { .canvas-controls { flex-wrap: wrap; max-width: calc(100% - 28px); } }
+
+.flashcards { flex: 1; min-width: 0; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 28px 24px 36px; background: #fffaf1; }
+.flashcards-bar { display: flex; align-items: center; justify-content: space-between; width: min(100%, 620px); font-size: 12px; color: #8b7697; }
+.flashcards-progress { width: min(100%, 620px); height: 4px; background: #eee1f3; border-radius: 3px; margin: 8px 0 24px; overflow: hidden; flex-shrink: 0; }
+.flashcards-progress span { display: block; height: 100%; border-radius: 3px; background: #b08bca; transition: width .2s; }
+.flashcard { display: flex; flex-direction: column; width: min(100%, 620px); padding: 16px; background: #fff9ed; border: 2px solid #dbc4df; border-radius: 18px; box-shadow: 0 5px 0 #e6d2ea; flex-shrink: 0; }
+.flashcard:hover { border-color: #b996cc; }
+.flashcard-image { display: flex; align-items: center; justify-content: center; width: 100%; height: clamp(180px, 44vh, 430px); background: #fff; border-radius: 11px; overflow: hidden; }
+.flashcard-image img { width: 100%; height: 100%; object-fit: contain; user-select: none; }
+.flashcard-missing { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #b29ac0; font-weight: 400; }
+.flashcard-answer { min-height: 92px; display: flex; align-items: center; justify-content: center; padding: 18px 12px 6px; width: 100%; }
+.flashcard-answer > span { color: #a18aad; font-size: 13px; font-weight: 400; }
+.flashcard-answer h2 { font-family: 'Cooper Black', 'Bookman Old Style', Georgia, serif; font-size: clamp(23px, 4vw, 32px); color: #665073; margin: 0; overflow-wrap: anywhere; }
+.flashcard.revealed { border-color: #b08bca; }
+.flashcards-navigation { width: min(100%, 620px); display: flex; justify-content: space-between; margin-top: 24px; gap: 14px; }
+.flashcards-empty { justify-content: center; text-align: center; color: #987ca9; }
+.flashcards-empty h2 { font-family: Georgia, serif; color: #6d537b; font-size: 26px; margin: 20px 0 8px; }
+.flashcards-empty p { font-size: 13px; margin-bottom: 24px; }
+@media (max-width: 700px) { .editor-actions { flex-wrap: wrap; }.mode-toggle button { padding: 7px 8px; }.flashcards { padding: 20px 16px 28px; }.flashcard { padding: 12px; }.flashcards-progress { margin-bottom: 18px; }.flashcard-answer { min-height: 78px; } }

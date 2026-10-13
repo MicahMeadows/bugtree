@@ -5,6 +5,7 @@ import { createElement } from 'react'
 import { newNode, validateNodes, descendants, reorderNode } from '../supabase/functions/site-api/tree-model.js'
 import { layoutTree } from '../src/tree-layout.js'
 import { moveSibling, siblingDrop, isDefaultTaxon } from '../src/tree-order.js'
+import { flashcardDeck, shuffleCards } from '../src/flashcard-deck.js'
 import { reconcileSave } from '../src/autosave.js'
 import { zoomAt, wheelZoom, fitCamera, pinchCamera, MIN_ZOOM, MAX_ZOOM } from '../src/canvas-camera.js'
 
@@ -88,6 +89,11 @@ const pinch = pinchCamera(camera, { center: pointer, distance: 100 }, { center: 
 assert.equal(pinch.zoom, 1.4)
 assert.ok(Math.abs((360 - pinch.x) / pinch.zoom - world.x) < 1e-8, 'Pinch must combine zoom and midpoint panning')
 assert.ok(Math.abs((235 - pinch.y) / pinch.zoom - world.y) < 1e-8)
+const studyNodes = [{ ...root }, { ...a, name: 'Hidden taxon answer', photo: 'test-photo' }, { ...b, photo: 'second-photo' }, { ...leaf }]
+assert.deepEqual(flashcardDeck(studyNodes).map((n) => n.id), [a.id, b.id], 'Skip cards without photos')
+const shuffled = shuffleCards(flashcardDeck(studyNodes), () => 0)
+assert.deepEqual(shuffled.map((n) => n.id), [b.id, a.id])
+assert.deepEqual(flashcardDeck(studyNodes).map((n) => n.id), [a.id, b.id], 'Shuffle cannot modify the tree order')
 const server = await createServer({ server: { middlewareMode: true } })
 try {
   const { default: TreeEditor } = await server.ssrLoadModule('/src/TreeEditor.jsx')
@@ -98,6 +104,13 @@ try {
   const chart = { id, name: 'Test tree', description: '', nodes, version: 1 }
   const props = { initialChart: chart, initialPhotos: {}, onBack() {}, onAuthError() {} }
   const edit = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialMode: 'edit' }))
+  const flash = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialChart: { ...chart, nodes: studyNodes }, initialPhotos: { 'test-photo': 'https://example.com/photo.png', 'second-photo': 'https://example.com/photo2.png' }, initialMode: 'flashcards' }))
+  assert.ok(flash.includes('Flash cards') && flash.includes('Card 1 of 2'))
+  assert.ok(flash.includes('Insect to identify') && flash.includes('Tap to reveal the name'))
+  assert.ok(!flash.includes('Hidden taxon answer'), 'The answer cannot leak in the initial flash card markup or image alt text')
+  assert.ok(!flash.includes('tree-stage'), 'Flash cards replace the graph')
+  const emptyStudy = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialMode: 'flashcards' }))
+  assert.ok(emptyStudy.includes('No photos to study yet'))
   const view = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialMode: 'view' }))
   assert.ok(!edit.includes('Taxon editor') && !edit.includes('New bullet'), 'Edit mode starts without selecting a card')
   assert.ok(!edit.includes('More options') && !edit.includes('inline-options'))

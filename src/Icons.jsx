@@ -1,6 +1,8 @@
 import bugtreeIcon from './assets/bugtree-icon.png'
 
 const paths = {
+  cards: <><rect x="7" y="3" width="14" height="17" rx="2" /><path d="M4 7H3v14h14v-1M11 8h6M11 12h6" /></>,
+  shuffle: <><path d="M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 3-2 4-4M14 8c1-1 2-2 4-2h3m-4-4 4 4-4 4" /></>,
   plus: <path d="M12 5v14M5 12h14" />,
   back: <path d="m14 6-6 6 6 6M8 12h12" />,
   edit: <><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15z" /></>,
