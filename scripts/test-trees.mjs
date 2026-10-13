@@ -64,8 +64,10 @@ for (let i = 1; i < sortedLeaves.length; i++) assert.ok(sortedLeaves[i - 1].y + 
 const expanded = layoutTree(nodes, a.id, 440)
 assert.equal(expanded.items.find((n) => n.id === a.id).height, 440)
 for (const item of expanded.items) for (const other of expanded.items) if (item.id !== other.id && item.depth === other.depth) assert.ok(item.y + item.height <= other.y || other.y + other.height <= item.y, 'Inline editing must not overlap sibling cards')
-const circle = { ...newNode(root.id, '', 'Suborder', 'sage'), type: 'suborder' }
+const circle = { ...newNode(root.id, '', 'Group', 'sage'), type: 'simple' }
 assert.equal(isCircle(circle), true)
+assert.equal(isCircle({ ...circle, type: 'taxon', rank: 'Suborder', name: 'Named suborder' }), false, 'Suborder is a rank, not a circle style')
+assert.equal(isCircle({ ...circle, type: 'suborder' }), true, 'Legacy simple nodes retain their shape')
 assert.equal(validateNodes([root, circle], id), null)
 assert.equal(isCircle({ ...circle, name: 'Named suborder' }), true)
 assert.ok(validateNodes([root, { ...circle, type: 'taxon', rank: 'Family' }], id))
@@ -199,7 +201,7 @@ try {
   const inline = renderToStaticMarkup(createElement(InlineTaxonCard, { node: leaf, nodes, onReparent() {}, photos: {}, onChange() {}, onPhoto() {}, onDelete() {}, onClose() {}, onHeightChange() {} }))
   assert.ok(inline.includes('Move branch under another node') && inline.includes('Choose new parent…'))
   assert.ok(inline.includes('Taxon editor') && inline.includes('New bullet'))
-  assert.ok(inline.includes('>Suborder</option>') && !inline.includes('circle if untitled') && !inline.includes('Redirect before this node'))
+  assert.ok(inline.includes('>Suborder</option>') && inline.includes('>Simple Node</option>') && inline.includes('>Infraorder</option>') && inline.includes('>Superfamily</option>') && inline.includes('>Subfamily</option>') && !inline.includes('>Taxon</option>') && !inline.includes('circle if untitled') && !inline.includes('Redirect before this node'))
   const routeProps = { ...props, initialChart: { ...chart, nodes: routed.nodes } }
   const routeEdit = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'edit' }))
   const routeView = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'view' }))

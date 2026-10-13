@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Icon } from './Icons'
 import { parentOptions } from './tree-reparent'
-import { COLORS } from '../supabase/functions/site-api/tree-model'
+import { COLORS, CARD_RANKS } from '../supabase/functions/site-api/tree-model'
 
 function Bullet({ value, index, busy, onChange, onDelete }) {
   const input = useRef(null)
@@ -24,8 +24,8 @@ export default function InlineTaxonCard({ node, nodes = [], onReparent, photos, 
       <input aria-label="Taxon name" title="Click to edit title" value={node.name} maxLength={200} disabled={busy} onChange={(e) => onChange({ name: e.target.value })} placeholder={node.type === 'redirect' ? 'Redirect (optional)' : 'Taxon name'} />
       <button className="inline-done icon-button" title="Finish editing" aria-label="Finish editing card" onClick={onClose}><Icon name="close" size={14} /></button>
     </div>
-    <label className="node-type-control">Type<select aria-label="Node type" value={node.type === 'suborder' || node.rank === 'Suborder' ? 'suborder' : 'taxon'} disabled={busy} onChange={(e) => onChange({ type: e.target.value, rank: e.target.value === 'suborder' ? 'Suborder' : (node.rank === 'Suborder' ? 'Group' : node.rank) })}><option value="taxon">Taxon</option><option value="suborder">Suborder</option></select></label>
-    {node.parentId !== null && onReparent && <label className="node-type-control">Move under<select aria-label="Move branch under another node" value="" disabled={busy || !parentOptions(nodes, node.id).length} onChange={(e) => { if (e.target.value) onReparent(e.target.value) }}><option value="">Choose new parent…</option>{parentOptions(nodes, node.id).map((parent) => <option key={parent.id} value={parent.id}>{parent.name || 'Untitled suborder'}{parent.rank && parent.rank !== 'Group' ? ` (${parent.rank})` : ''}</option>)}</select></label>}
+    <label className="node-type-control">Type<select aria-label="Node type" value={node.type === 'simple' || node.type === 'suborder' ? 'simple' : CARD_RANKS.includes(node.rank) ? node.rank : ''} disabled={busy} onChange={(e) => onChange(e.target.value === 'simple' ? { type: 'simple', rank: 'Group' } : { type: 'taxon', rank: e.target.value })}><option value="" disabled>Choose type…</option>{CARD_RANKS.map((rank) => <option key={rank} value={rank}>{rank}</option>)}<option value="simple">Simple Node</option></select></label>
+    {node.parentId !== null && onReparent && <label className="node-type-control">Move under<select aria-label="Move branch under another node" value="" disabled={busy || !parentOptions(nodes, node.id).length} onChange={(e) => { if (e.target.value) onReparent(e.target.value) }}><option value="">Choose new parent…</option>{parentOptions(nodes, node.id).map((parent) => <option key={parent.id} value={parent.id}>{parent.name || 'Simple Node'}{parent.rank && parent.rank !== 'Group' ? ` (${parent.rank})` : ''}</option>)}</select></label>}
     <div className="inline-card-content">
       <div className="inline-notes">
         {node.bullets.map((bullet, i) => <Bullet key={i} value={bullet} index={i} busy={busy} onChange={(value) => onChange({ bullets: node.bullets.map((b, j) => j === i ? value : b) })} onDelete={() => onChange({ bullets: node.bullets.filter((_, j) => j !== i) })} />)}

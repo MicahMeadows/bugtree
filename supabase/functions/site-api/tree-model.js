@@ -2,8 +2,9 @@ export const MAX_NODES = 200
 export const MAX_DEPTH = 12
 export const COLORS = ['rose', 'sage', 'sand', 'sky', 'lavender']
 export const RANKS = ['Class', 'Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily', 'Tribe', 'Genus', 'Species', 'Group']
-export const NODE_TYPES = ['taxon', 'suborder', 'redirect']
-export function isCircle(node) { return node.type === 'redirect' || node.type === 'suborder' || node.rank === 'Suborder' }
+export const CARD_RANKS = ['Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily']
+export const NODE_TYPES = ['taxon', 'simple', 'suborder', 'redirect']
+export function isCircle(node) { return node.type === 'redirect' || node.type === 'simple' || node.type === 'suborder' }
 export function newNode(parentId = null, name = 'New taxon', rank = 'Group', color = 'lavender') {
   return { id: crypto.randomUUID(), parentId, name, rank, bullets: [], photo: '', photoAlt: '', color, type: 'taxon', offsetX: 0, offsetY: 0 }
 }
@@ -24,7 +25,7 @@ export function validateNodes(nodes, chartId) {
     ids.add(n.id)
     if (n.type !== undefined && !NODE_TYPES.includes(n.type)) return 'Invalid node type.'
     if ((n.offsetX !== undefined && (!Number.isFinite(n.offsetX) || Math.abs(n.offsetX) > 10000)) || (n.offsetY !== undefined && (!Number.isFinite(n.offsetY) || Math.abs(n.offsetY) > 10000))) return 'Invalid redirect position.'
-    if (typeof n.name !== 'string' || (!n.name.trim() && n.type !== 'redirect' && n.type !== 'suborder' && n.rank !== 'Suborder') || n.name.length > 200) return 'Give each taxon a name (up to 200 characters).'
+    if (typeof n.name !== 'string' || (!n.name.trim() && n.type !== 'redirect' && n.type !== 'suborder' && n.type !== 'simple') || n.name.length > 200) return 'Give each taxon a name (up to 200 characters).'
     if (typeof n.rank !== 'string' || n.rank.length > 80) return 'Taxonomic ranks must be under 80 characters.'
     if (!COLORS.includes(n.color)) return 'Invalid label color.'
     if (!Array.isArray(n.bullets) || n.bullets.length > 30 || n.bullets.some((b) => typeof b !== 'string' || b.length > 500)) return 'Use up to 30 notes of 500 characters per taxon.'

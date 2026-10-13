@@ -48,7 +48,7 @@ try {
   const cycle = await call('chart-save', { ...chart, nodes: chart.nodes.map((n) => n.id === chart.nodes[0].id ? { ...n, parentId: child.id } : n) }, token)
   assert.equal(cycle.status, 400)
   const routing = insertRedirect(chart.nodes, child.id, 'sage')
-  const circle = { ...newNode(chart.nodes[0].id, '', 'Suborder', 'sage'), type: 'suborder' }
+  const circle = { ...newNode(chart.nodes[0].id, '', 'Group', 'sage'), type: 'simple' }
   routing.redirect.offsetX = 180; routing.redirect.offsetY = 70
   const routeSave = await call('chart-save', { ...chart, nodes: [...routing.nodes, circle] }, token)
   assert.equal(routeSave.status, 200, JSON.stringify(routeSave.body))
