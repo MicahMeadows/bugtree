@@ -5,7 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:database": "node --env-file=.env.local scripts/test-database.mjs"
+    "test:database": "node --env-file=.env.local scripts/test-database.mjs",
+    "test": "node scripts/test-trees.mjs"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,7 @@
     "url": "https://github.com/micahmeadows/bugtree/issues"
   },
   "homepage": "https://github.com/micahmeadows/bugtree#readme",
-  "description": "React todo demo with Supabase persistence and GitHub Pages deployment",
+  "description": "Password-protected insect taxonomy notebook with horizontal trees and Supabase persistence",
   "dependencies": {
     "@supabase/supabase-js": "2.117.3",
     "react": "19.3.0",

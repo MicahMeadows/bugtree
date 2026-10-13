@@ -1,3 +1,4 @@
+import { newNode, validateNodes } from './tree-model.js'
 import { createClient } from 'npm:@supabase/supabase-js@2.117.3'
 
 const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
@@ -52,24 +53,72 @@ Deno.serve(async (req) => {
       check(result.error)
       return reply({ ok: true })
     }
-    const columns = 'id,title,completed,created_at'
-    let result
-    if (body.action === 'list') {
-      result = await db.from('todos').select(columns).order('id')
-    } else if (body.action === 'add') {
-      if (typeof body.title !== 'string' || !body.title.trim() || body.title.trim().length > 200) return reply({ error: 'Enter a task between 1 and 200 characters.' }, 400)
-      result = await db.from('todos').insert({ title: body.title.trim() }).select(columns).single()
-    } else if (body.action === 'toggle' || body.action === 'delete') {
-      if (!Number.isSafeInteger(body.id) || body.id < 1) return reply({ error: 'Invalid todo ID' }, 400)
-      if (body.action === 'toggle') {
-        if (typeof body.completed !== 'boolean') return reply({ error: 'Invalid completion value' }, 400)
-        result = await db.from('todos').update({ completed: body.completed }).eq('id', body.id).select(columns).single()
-      } else {
-        result = await db.from('todos').delete().eq('id', body.id).select('id').single()
-      }
-    } else return reply({ error: 'Unknown action' }, 400)
-    check(result.error)
-    return reply({ data: result.data })
+    const chartColumns = 'id,name,description,nodes,node_count,version,created_at,updated_at'
+    const validId = (id: unknown) => typeof id === 'string' && /^[a-f0-9-]{36}$/.test(id)
+    if (body.action === 'charts-list') {
+      const result = await db.from('taxonomy_charts').select('id,name,description,node_count,version,updated_at').is('deleted_at', null).order('updated_at', { ascending: false })
+      check(result.error)
+      return reply({ data: result.data })
+    }
+    if (body.action === 'chart-create') {
+      if (typeof body.name !== 'string' || !body.name.trim() || body.name.length > 200) return reply({ error: 'Give your chart a name (up to 200 characters).' }, 400)
+      const root = newNode(null, 'Insecta', 'Class')
+      const result = await db.from('taxonomy_charts').insert({ name: body.name.trim(), nodes: [root] }).select(chartColumns).single()
+      check(result.error)
+      return reply({ data: result.data, photoUrls: {} })
+    }
+    if (!validId(body.id)) return reply({ error: 'Invalid chart ID' }, 400)
+    const existing = await db.from('taxonomy_charts').select(chartColumns).eq('id', body.id).is('deleted_at', null).maybeSingle()
+    check(existing.error)
+    if (!existing.data) return reply({ error: 'This chart is no longer available.' }, 404)
+    const bucket = db.storage.from('taxonomy-photos')
+    const signPhotos = async (paths: string[]) => {
+      if (!paths.length) return {}
+      const ttl = Math.max(1, Math.min(3600, Math.floor((Date.parse(session.data.expires_at) - Date.now()) / 1000)))
+      const signed = await bucket.createSignedUrls(paths, ttl)
+      check(signed.error)
+      return Object.fromEntries(signed.data.filter((p) => p.signedUrl).map((p) => [p.path, p.signedUrl]))
+    }
+    if (body.action === 'chart-load') return reply({ data: existing.data, photoUrls: await signPhotos(existing.data.nodes.map((n: { photo: string }) => n.photo).filter(Boolean)) })
+    if (body.action === 'chart-save') {
+      if (typeof body.name !== 'string' || !body.name.trim() || body.name.length > 200 || typeof body.description !== 'string' || body.description.length > 2000) return reply({ error: 'Check your chart name and description.' }, 400)
+      const invalid = validateNodes(body.nodes, body.id)
+      if (invalid) return reply({ error: invalid }, 400)
+      if (JSON.stringify(body.nodes).length > 1000000) return reply({ error: 'This chart is too large. Shorten its notes or split it into two trees.' }, 400)
+      if (!Number.isInteger(body.version) || body.version < 1) return reply({ error: 'Invalid chart version' }, 400)
+      const nodes = body.nodes.map((n: any) => ({ id: n.id, parentId: n.parentId, name: n.name.trim(), rank: n.rank, bullets: n.bullets, photo: n.photo, photoAlt: n.photoAlt, color: n.color }))
+      const result = await db.from('taxonomy_charts').update({ name: body.name.trim(), description: body.description, nodes, version: body.version + 1, updated_at: new Date().toISOString() }).eq('id', body.id).eq('version', body.version).is('deleted_at', null).select(chartColumns).maybeSingle()
+      check(result.error)
+      if (!result.data) return reply({ error: 'This chart changed in another tab. Your edits are still here; export a backup, then reopen the chart before saving.' }, 409)
+      return reply({ data: result.data })
+    }
+    if (body.action === 'chart-delete') {
+      const result = await db.from('taxonomy_charts').update({ deleted_at: new Date().toISOString(), version: existing.data.version + 1 }).eq('id', body.id).eq('version', body.version).is('deleted_at', null).select('id').maybeSingle()
+      check(result.error)
+      if (!result.data) return reply({ error: 'This chart changed. Refresh the library before deleting it.' }, 409)
+      return reply({ data: result.data })
+    }
+    if (body.action === 'photo-urls') {
+      if (!Array.isArray(body.paths) || body.paths.length > 200 || body.paths.some((p: unknown) => typeof p !== 'string' || !new RegExp(`^${body.id}/[a-f0-9-]{36}/[a-f0-9-]{36}\\.(jpg|png|webp)$`).test(p))) return reply({ error: 'Invalid photo references' }, 400)
+      return reply({ photoUrls: await signPhotos(body.paths) })
+    }
+    if (body.action === 'photo-upload') {
+      if (!validId(body.nodeId) || typeof body.image !== 'string' || body.image.length > 1400000) return reply({ error: 'Use an image under 1 MB.' }, 400)
+      const match = body.image.match(/^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/)
+      if (!match) return reply({ error: 'Use a JPEG, PNG, or WebP image.' }, 400)
+      let bytes
+      try { bytes = Uint8Array.from(atob(match[2]), (c) => c.charCodeAt(0)) } catch { return reply({ error: 'Invalid image' }, 400) }
+      if (!bytes.length || bytes.length > 1048576) return reply({ error: 'Use an image under 1 MB.' }, 400)
+      const jpeg = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255
+      const png = bytes.slice(0, 8).every((b, i) => b === [137,80,78,71,13,10,26,10][i]) && bytes.length > 8
+      const webp = new TextDecoder().decode(bytes.slice(0,4)) === 'RIFF' && new TextDecoder().decode(bytes.slice(8,12)) === 'WEBP'
+      if (!(match[1] === 'jpeg' ? jpeg : match[1] === 'png' ? png : webp)) return reply({ error: 'The image format could not be verified.' }, 400)
+      const path = `${body.id}/${body.nodeId}/${crypto.randomUUID()}.${match[1] === 'jpeg' ? 'jpg' : match[1]}`
+      const uploaded = await bucket.upload(path, bytes, { contentType: `image/${match[1]}`, upsert: false })
+      check(uploaded.error)
+      return reply({ path, photoUrls: await signPhotos([path]) })
+    }
+    return reply({ error: 'Unknown action' }, 400)
   } catch {
     return reply({ error: 'Could not complete the request. Please try again.' }, 500)
   }
