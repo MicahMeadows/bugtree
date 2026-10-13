@@ -22,7 +22,7 @@ export default function App() {
   async function login(event) {
     event.preventDefault()
     setBusy(true); setError('')
-    try { const result = await siteApi('login', { password }); saveSession(result); setSession(result); setPassword('') }
+    try { const result = await siteApi('login', { password: password.toLowerCase() }); saveSession(result); setSession(result); setPassword('') }
     catch (error) { handleError(error) } finally { setBusy(false) }
   }
   if (!session) return (
