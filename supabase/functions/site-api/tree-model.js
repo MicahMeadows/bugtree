@@ -3,7 +3,7 @@ export const MAX_DEPTH = 12
 export const COLORS = ['rose', 'sage', 'sand', 'sky', 'lavender']
 export const RANKS = ['Class', 'Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily', 'Tribe', 'Genus', 'Species', 'Group']
 export const NODE_TYPES = ['taxon', 'suborder', 'redirect']
-export function isCircle(node) { return node.type === 'redirect' || ((node.type === 'suborder' || node.rank === 'Suborder') && !node.name.trim()) }
+export function isCircle(node) { return node.type === 'redirect' || node.type === 'suborder' || node.rank === 'Suborder' }
 export function newNode(parentId = null, name = 'New taxon', rank = 'Group', color = 'lavender') {
   return { id: crypto.randomUUID(), parentId, name, rank, bullets: [], photo: '', photoAlt: '', color, type: 'taxon', offsetX: 0, offsetY: 0 }
 }

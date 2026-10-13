@@ -67,7 +67,7 @@ for (const item of expanded.items) for (const other of expanded.items) if (item.
 const circle = { ...newNode(root.id, '', 'Suborder', 'sage'), type: 'suborder' }
 assert.equal(isCircle(circle), true)
 assert.equal(validateNodes([root, circle], id), null)
-assert.equal(isCircle({ ...circle, name: 'Named suborder' }), false)
+assert.equal(isCircle({ ...circle, name: 'Named suborder' }), true)
 assert.ok(validateNodes([root, { ...circle, type: 'taxon', rank: 'Family' }], id))
 const routed = insertRedirect(nodes, a.id, 'sage')
 assert.equal(validateNodes(routed.nodes, id), null)
@@ -199,7 +199,7 @@ try {
   const inline = renderToStaticMarkup(createElement(InlineTaxonCard, { node: leaf, nodes, onReparent() {}, photos: {}, onChange() {}, onPhoto() {}, onDelete() {}, onClose() {}, onHeightChange() {} }))
   assert.ok(inline.includes('Move branch under another node') && inline.includes('Choose new parent…'))
   assert.ok(inline.includes('Taxon editor') && inline.includes('New bullet'))
-  assert.ok(inline.includes('Suborder (circle if untitled)') && !inline.includes('Redirect before this node'))
+  assert.ok(inline.includes('>Suborder</option>') && !inline.includes('circle if untitled') && !inline.includes('Redirect before this node'))
   const routeProps = { ...props, initialChart: { ...chart, nodes: routed.nodes } }
   const routeEdit = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'edit' }))
   const routeView = renderToStaticMarkup(createElement(TreeEditor, { ...routeProps, initialMode: 'view' }))
