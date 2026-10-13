@@ -38,6 +38,6 @@ export default function Flashcards({ nodes, photos, onEdit }) {
       <div className="flashcard-image">{photo && !imageFailed ? <img src={photo} alt="Insect to identify" draggable={false} onError={() => setImageFailed(true)} /> : <div className="flashcard-missing"><Icon name="image" size={40} /><span>Photo unavailable</span></div>}</div>
       <div className="flashcard-answer" aria-live="polite">{revealed ? <h2>{card.name}</h2> : <span>Tap to reveal the name</span>}</div>
     </button>
-    <div className="flashcards-navigation"><button className="secondary" onClick={() => move(-1)} disabled={deck.length < 2}><Icon name="back" size={16} /> Previous</button><button className="primary" onClick={() => move(1)} disabled={deck.length < 2}>{index === deck.length - 1 ? 'Start again' : 'Next'}<Icon name="back" size={16} className="reverse" /></button></div>
+    <div className="flashcards-navigation"><button className="secondary" onClick={() => move(-1)} disabled={deck.length < 2}><Icon name="back" size={16} /> Previous</button></div>
   </section>
 }

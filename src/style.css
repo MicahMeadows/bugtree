@@ -218,7 +218,7 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .plus-circle { background: #e7d3f0; border: 1.5px solid #bda0cb; }
 .bug-friends { display: block; width: 100%; height: auto; overflow: hidden; pointer-events: none; }
 
-.login-page { background: #eeddf2; background-image: none; justify-content: center; padding: 30px 24px; }
+.login-page { background: #fffaf1; background-image: none; justify-content: center; padding: 30px 24px; }
 .login-brand { margin-bottom: 12px; }
 .login-card { width: min(100%, 620px); padding: 36px 60px 0; margin: 18px 0; border: 2px solid #fff4e2; border-radius: 8px; background: #fff9ed; box-shadow: 0 12px 40px #a881ac18; overflow: hidden; }
 .login-card h1 { text-align: center; font-weight: 700; font-size: clamp(27px, 4vw, 36px); color: #51434f; letter-spacing: -.04em; }
@@ -314,3 +314,6 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .flashcards-empty h2 { font-family: Georgia, serif; color: #6d537b; font-size: 26px; margin: 20px 0 8px; }
 .flashcards-empty p { font-size: 13px; margin-bottom: 24px; }
 @media (max-width: 700px) { .editor-actions { flex-wrap: wrap; }.mode-toggle button { padding: 7px 8px; }.flashcards { padding: 20px 16px 28px; }.flashcard { padding: 12px; }.flashcards-progress { margin-bottom: 18px; }.flashcard-answer { min-height: 78px; } }
+
+/* Welcome uses the same neutral surfaces as the tree library. */
+.login-card { background: #fffaf1; border: 0; border-radius: 0; box-shadow: none; padding-bottom: 30px; }

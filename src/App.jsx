@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { siteApi, readSession, saveSession, clearSession, configured } from './supabase'
 import { Beetle, Icon } from './Icons'
 import Library from './Library'
-import BugFriends from './BugFriends'
 import TreeEditor from './TreeEditor'
 
 export default function App() {
@@ -39,7 +38,6 @@ export default function App() {
         {!configured && <p role="alert" className="error">Set your Supabase environment values.</p>}
         {error && <p role="alert" className="error">{error}</p>}
         <p className="login-note">We’ll remember your answer for seven days.</p>
-        <BugFriends />
       </main>
     </div>
   )
