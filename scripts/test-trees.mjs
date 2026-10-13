@@ -6,6 +6,7 @@ import { newNode, isCircle, validateNodes, descendants, reorderNode } from '../s
 import { layoutTree } from '../src/tree-layout.js'
 import { moveSibling, siblingDrop, isDefaultTaxon } from '../src/tree-order.js'
 import { insertRedirect, insertRedirectAt, removeRedirect, moveRedirect, moveBranch } from '../src/tree-routing.js'
+import { parentOptions, reparentBranch } from '../src/tree-reparent.js'
 import { flashcardDeck, shuffleCards } from '../src/flashcard-deck.js'
 import { reconcileSave } from '../src/autosave.js'
 import { zoomAt, wheelZoom, fitCamera, pinchCamera, MIN_ZOOM, MAX_ZOOM } from '../src/canvas-camera.js'
@@ -120,6 +121,18 @@ const cleanColumn = layoutTree(positioned, null, 0, true)
 assert.ok(cleanColumn.items.every(n=>n.type !== 'redirect'))
 assert.deepEqual(cleanColumn.items.map(n=>[n.id,n.parentId,n.x,n.y,n.width,n.height]).sort(), layout.items.map(n=>[n.id,n.parentId,n.x,n.y,n.width,n.height]).sort(), 'Column toggle restores the original layout without redirects or offsets')
 assert.equal(JSON.stringify(positioned),beforeColumn,'Column mode must not change saved positions or routing')
+const adopted = reparentBranch(nodes, a.id, b.id)
+assert.equal(adopted.find(n=>n.id===a.id).parentId,b.id)
+assert.strictEqual(adopted.find(n=>n.id===leaf.id),leaf,'Descendant data and parent links must survive moving the branch')
+assert.equal(validateNodes(adopted,id),null)
+assert.strictEqual(reparentBranch(nodes,a.id,leaf.id),nodes,'Cannot reparent under a descendant')
+assert.strictEqual(reparentBranch(nodes,a.id,a.id),nodes,'Cannot reparent under itself')
+assert.strictEqual(reparentBranch(nodes,root.id,b.id),nodes,'The root cannot change parents')
+assert.strictEqual(reparentBranch(nodes,a.id,'missing'),nodes)
+assert.deepEqual(parentOptions(nodes,a.id).map(n=>n.id),[b.id])
+const positionedBranch = moveBranch(nodes,a.id,150,100)
+const repositioned = reparentBranch(positionedBranch,a.id,b.id).find(n=>n.id===a.id)
+assert.equal(repositioned.offsetX,0);assert.equal(repositioned.offsetY,0)
 const snapshot = { name: 'Before', nodes, version: 1 }
 const saved = { ...snapshot, version: 2, updated_at: '2026-10-13T00:00:00Z' }
 assert.deepEqual(reconcileSave(snapshot, snapshot, saved), { chart: saved, dirty: false })
@@ -183,7 +196,8 @@ try {
   assert.ok(edit.includes('Add sibling to Branch A'))
   assert.ok(!edit.includes('inline-taxon') && !edit.includes('inline-inspector'))
   const { default: InlineTaxonCard } = await server.ssrLoadModule('/src/InlineTaxonCard.jsx')
-  const inline = renderToStaticMarkup(createElement(InlineTaxonCard, { node: leaf, photos: {}, onChange() {}, onPhoto() {}, onDelete() {}, onClose() {}, onHeightChange() {} }))
+  const inline = renderToStaticMarkup(createElement(InlineTaxonCard, { node: leaf, nodes, onReparent() {}, photos: {}, onChange() {}, onPhoto() {}, onDelete() {}, onClose() {}, onHeightChange() {} }))
+  assert.ok(inline.includes('Move branch under another node') && inline.includes('Choose new parent…'))
   assert.ok(inline.includes('Taxon editor') && inline.includes('New bullet'))
   assert.ok(inline.includes('Suborder (circle if untitled)') && !inline.includes('Redirect before this node'))
   const routeProps = { ...props, initialChart: { ...chart, nodes: routed.nodes } }

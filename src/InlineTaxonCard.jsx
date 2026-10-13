@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Icon } from './Icons'
+import { parentOptions } from './tree-reparent'
 import { COLORS } from '../supabase/functions/site-api/tree-model'
 
 function Bullet({ value, index, busy, onChange, onDelete }) {
@@ -7,7 +8,7 @@ function Bullet({ value, index, busy, onChange, onDelete }) {
   useLayoutEffect(() => { const el = input.current; el.style.height = 'auto'; el.style.height = `${el.scrollHeight}px` }, [value])
   return <div className="inline-bullet"><span>•</span><textarea ref={input} aria-label={`Identification note ${index + 1}`} value={value} maxLength={500} rows={1} placeholder="Add a note…" disabled={busy} onChange={(e) => onChange(e.target.value)} /><button className="icon-button" disabled={busy} aria-label={`Delete note ${index + 1}`} title="Delete bullet" onClick={onDelete}><Icon name="close" size={13} /></button></div>
 }
-export default function InlineTaxonCard({ node, photos, busy, photoBusy, onChange, onPhoto, onDelete, onClose, onHeightChange }) {
+export default function InlineTaxonCard({ node, nodes = [], onReparent, photos, busy, photoBusy, onChange, onPhoto, onDelete, onClose, onHeightChange }) {
   const container = useRef(null)
   useEffect(() => {
     const el = container.current
@@ -24,6 +25,7 @@ export default function InlineTaxonCard({ node, photos, busy, photoBusy, onChang
       <button className="inline-done icon-button" title="Finish editing" aria-label="Finish editing card" onClick={onClose}><Icon name="close" size={14} /></button>
     </div>
     <label className="node-type-control">Type<select aria-label="Node type" value={node.type === 'suborder' || node.rank === 'Suborder' ? 'suborder' : 'taxon'} disabled={busy} onChange={(e) => onChange({ type: e.target.value, rank: e.target.value === 'suborder' ? 'Suborder' : (node.rank === 'Suborder' ? 'Group' : node.rank) })}><option value="taxon">Taxon</option><option value="suborder">Suborder (circle if untitled)</option></select></label>
+    {node.parentId !== null && onReparent && <label className="node-type-control">Move under<select aria-label="Move branch under another node" value="" disabled={busy || !parentOptions(nodes, node.id).length} onChange={(e) => { if (e.target.value) onReparent(e.target.value) }}><option value="">Choose new parent…</option>{parentOptions(nodes, node.id).map((parent) => <option key={parent.id} value={parent.id}>{parent.name || 'Untitled suborder'}{parent.rank && parent.rank !== 'Group' ? ` (${parent.rank})` : ''}</option>)}</select></label>}
     <div className="inline-card-content">
       <div className="inline-notes">
         {node.bullets.map((bullet, i) => <Bullet key={i} value={bullet} index={i} busy={busy} onChange={(value) => onChange({ bullets: node.bullets.map((b, j) => j === i ? value : b) })} onDelete={() => onChange({ bullets: node.bullets.filter((_, j) => j !== i) })} />)}

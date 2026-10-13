@@ -68,3 +68,5 @@ The local tests verify tree topology, layout, branch ordering, depth limits, edi
 - `supabase/imports/bug11-heteroptera.json` records the names, readable notes, and branch structure imported from bug11. The initial import left photos blank; `supabase/imports/bug12-14-heteroptera.json` records the 18 photo crops and clearer notes added from bug12–14.
 
 - Node dragging starts locked when entering Edit. Use the bottom-left **Unlock layout / Lock layout** control; card editing, panning, and zooming stay available while locked. Column mode keeps positions fixed.
+
+- In a selected card, **Move under** attaches the card and its entire subtree to a new parent. Its local position resets under the new parent; notes, photos, and descendant links remain. The root, the branch itself, and its descendants cannot be chosen as moves that create loops. Changes autosave and support Undo.
