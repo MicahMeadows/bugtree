@@ -1,0 +1,5 @@
+project_id = "bugtree"
+
+[functions.site-api]
+# The handler checks our custom site session on every protected action.
+verify_jwt = false
