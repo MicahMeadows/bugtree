@@ -345,3 +345,15 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .layout-lock-toggle.active { background: #eadbf6; }
 .redirect-node.circle-node { cursor: pointer; }
 .redirect-node.circle-node.draggable { cursor: grab; }
+
+.flashcards-workspace { display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.flashcards-tree-picker { width: 240px; flex-shrink: 0; overflow-y: auto; padding: 24px 16px; border-right: 1px solid var(--border); background: #fff9ed; }
+.flashcards-tree-picker h2 { margin: 0 0 18px; font-size: 19px; font-family: Georgia, serif; }
+.flashcards-tree-list { display: flex; flex-direction: column; gap: 8px; }
+.flashcards-tree-option { padding: 9px 8px; border-radius: 8px; }
+.flashcards-tree-option:has(input:checked) { background: #eadbf680; }
+.flashcards-tree-option label { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; font-size: 14px; overflow-wrap: anywhere; }
+.flashcards-tree-option input { width: 16px; height: 16px; margin: 2px 0 0; flex-shrink: 0; accent-color: #8d67b6; }
+.flashcards-tree-option small { display: block; margin-top: 5px; font-size: 11px; color: var(--muted); }
+.flashcards-tree-option .error { font-size: 12px; margin-top: 8px; }
+@media (max-width: 700px) { .flashcards-workspace { flex-direction: column; }.flashcards-tree-picker { width: 100%; max-height: 190px; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--border); }.flashcards-tree-picker h2 { margin-bottom: 8px; font-size: 16px; }.flashcards-tree-list { flex-direction: row; flex-wrap: wrap; gap: 4px; }.flashcards-tree-option { max-width: 100%; padding: 6px 8px; } }

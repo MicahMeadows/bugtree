@@ -70,3 +70,5 @@ The local tests verify tree topology, layout, branch ordering, depth limits, edi
 - Node dragging starts locked when entering Edit. Use the bottom-left **Unlock layout / Lock layout** control; card editing, panning, and zooming stay available while locked. Column mode keeps positions fixed.
 
 - In a selected card, **Move under** attaches the card and its entire subtree to a new parent. Its local position resets under the new parent; notes, photos, and descendant links remain. The root, the branch itself, and its descendants cannot be chosen as moves that create loops. Changes autosave and support Undo.
+
+- Flash Cards includes a tree picker on the left (above the quiz on mobile). Check multiple trees to combine their photo cards and notes into one deck. The current tree starts selected. Changing the loaded tree selection restarts the deck with hidden answers; Shuffle mixes all included cards.

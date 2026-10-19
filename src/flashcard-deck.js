@@ -9,3 +9,15 @@ export function shuffleCards(cards, random = Math.random) {
   }
   return shuffled
 }
+
+export function combineFlashcardTrees(trees) {
+  const seen = new Set()
+  const nodes = [], photos = {}
+  for (const tree of trees) {
+    if (!tree || seen.has(tree.chart.id)) continue
+    seen.add(tree.chart.id)
+    for (const node of tree.chart.nodes) nodes.push({ ...node, id: `${tree.chart.id}:${node.id}` })
+    Object.assign(photos, tree.photos)
+  }
+  return { nodes, photos }
+}

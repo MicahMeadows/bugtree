@@ -7,7 +7,7 @@ import { layoutTree } from '../src/tree-layout.js'
 import { moveSibling, siblingDrop, isDefaultTaxon } from '../src/tree-order.js'
 import { insertRedirect, insertRedirectAt, removeRedirect, moveRedirect, moveBranch } from '../src/tree-routing.js'
 import { parentOptions, reparentBranch } from '../src/tree-reparent.js'
-import { flashcardDeck, shuffleCards } from '../src/flashcard-deck.js'
+import { flashcardDeck, shuffleCards, combineFlashcardTrees } from '../src/flashcard-deck.js'
 import { reconcileSave } from '../src/autosave.js'
 import { zoomAt, wheelZoom, fitCamera, pinchCamera, MIN_ZOOM, MAX_ZOOM } from '../src/canvas-camera.js'
 
@@ -167,6 +167,16 @@ assert.ok(Math.abs((360 - pinch.x) / pinch.zoom - world.x) < 1e-8, 'Pinch must c
 assert.ok(Math.abs((235 - pinch.y) / pinch.zoom - world.y) < 1e-8)
 const studyNodes = [{ ...root }, { ...a, name: 'Hidden taxon answer', photo: 'test-photo', bullets: ['Distinctive wing venation', 'Elbowed antennae', ''] }, { ...b, photo: 'second-photo' }, { ...leaf }]
 assert.deepEqual(flashcardDeck(studyNodes).map((n) => n.id), [a.id, b.id], 'Skip cards without photos')
+const secondTreeNode = { ...a, name: 'Second tree insect', photo: 'second-tree-photo' }
+const firstTree = { chart: { id: 'first-tree', nodes: studyNodes }, photos: { 'test-photo': 'first-url' } }
+const secondTree = { chart: { id: 'second-tree', nodes: [secondTreeNode] }, photos: { 'second-tree-photo': 'second-url' } }
+const mixedQuiz = combineFlashcardTrees([firstTree, secondTree, firstTree])
+assert.equal(flashcardDeck(mixedQuiz.nodes).length, 3, 'Selected trees combine without duplicate trees')
+assert.equal(new Set(mixedQuiz.nodes.map(n=>n.id)).size, mixedQuiz.nodes.length, 'Same node IDs in different trees remain distinct quiz cards')
+assert.equal(mixedQuiz.photos['second-tree-photo'],'second-url')
+assert.equal(flashcardDeck(combineFlashcardTrees([secondTree]).nodes).length,1,'Unchecking a tree removes all of its cards')
+assert.deepEqual(combineFlashcardTrees([]),{nodes:[],photos:{}})
+assert.equal(secondTreeNode.id,a.id,'Combining decks does not change source nodes')
 const shuffled = shuffleCards(flashcardDeck(studyNodes), () => 0)
 assert.deepEqual(shuffled.map((n) => n.id), [b.id, a.id])
 assert.deepEqual(flashcardDeck(studyNodes).map((n) => n.id), [a.id, b.id], 'Shuffle cannot modify the tree order')
@@ -181,6 +191,7 @@ try {
   const props = { initialChart: chart, initialPhotos: {}, onBack() {}, onAuthError() {} }
   const edit = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialMode: 'edit' }))
   const flash = renderToStaticMarkup(createElement(TreeEditor, { ...props, initialChart: { ...chart, nodes: studyNodes }, initialPhotos: { 'test-photo': 'https://example.com/photo.png', 'second-photo': 'https://example.com/photo2.png' }, initialMode: 'flashcards' }))
+  assert.ok(flash.includes('Trees in flash card quiz') && flash.includes('type="checkbox"') && flash.includes('Test tree'))
   assert.ok(flash.includes('Flash cards') && flash.includes('Card 1 of 2'))
   assert.ok(flash.includes('Insect to identify') && flash.includes('Tap to reveal the name'))
   assert.ok(flash.includes('Distinctive wing venation') && flash.includes('Elbowed antennae'), 'Identification details are visible before revealing the name')
