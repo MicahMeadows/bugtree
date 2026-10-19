@@ -1,8 +1,8 @@
 export const MAX_NODES = 200
 export const MAX_DEPTH = 12
 export const COLORS = ['rose', 'sage', 'sand', 'sky', 'lavender']
-export const RANKS = ['Class', 'Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily', 'Tribe', 'Genus', 'Species', 'Group']
-export const CARD_RANKS = ['Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily']
+export const RANKS = ['Phylum', 'Subphylum', 'Class', 'Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily', 'Tribe', 'Genus', 'Species', 'Group']
+export const CARD_RANKS = ['Phylum', 'Subphylum', 'Class', 'Order', 'Suborder', 'Infraorder', 'Superfamily', 'Family', 'Subfamily']
 export const NODE_TYPES = ['taxon', 'simple', 'suborder', 'redirect']
 export function isCircle(node) { return node.type === 'redirect' || node.type === 'simple' || node.type === 'suborder' }
 export function newNode(parentId = null, name = 'New taxon', rank = 'Group', color = 'lavender') {
