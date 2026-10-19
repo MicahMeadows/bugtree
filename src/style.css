@@ -142,8 +142,8 @@ dialog::backdrop { background: #30233966; backdrop-filter: blur(3px); }
 .taxon-content ul { list-style: disc; padding-left: 13px; margin: 0; font-size: 12px; line-height: 18px; flex: 1; min-width: 0; }
 .taxon-content li { padding-left: 1px; margin-bottom: 7px; overflow-wrap: anywhere; }
 .taxon-content.has-photo ul { width: 50%; }
-.taxon-photo { width: 130px; flex-shrink: 0; height: 120px; overflow: hidden; border-radius: 3px; }
-.taxon-photo img { width: 100%; height: 100%; object-fit: cover; }
+.taxon-photo { width: 170px; flex-shrink: 0; height: 120px; overflow: hidden; border-radius: 3px; }
+.taxon-photo img { width: 100%; height: 100%; object-fit: contain; }
 .photo-placeholder { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f0ebf3; color: #b2a5bb; font-size: 9px; gap: 10px; }
 .node-edit-hint { position: absolute; right: 8px; top: 8px; opacity: 0; background: #fff9ede0; border-radius: 4px; padding: 4px; color: #675078; }
 .taxon-card:hover .node-edit-hint, .taxon-card.selected .node-edit-hint { opacity: 1; }
@@ -258,8 +258,8 @@ input::placeholder, textarea::placeholder { color: #a78dae; }
 .inline-bullet textarea:hover, .inline-bullet textarea:focus { border-color: #d7bcdf; background: #fffcf5; }
 .inline-bullet .icon-button { width: 16px; height: 23px; padding: 1px; color: #b093b7; }
 .inline-new-bullet { justify-content: flex-start; font-size: 10px; padding: 5px 0; gap: 3px; color: #9a78ae; }
-.inline-photo { position: relative; width: 120px; height: 112px; flex-shrink: 0; border: 1px dashed #c4a8d0; border-radius: 8px; background: #f0e3f5; overflow: hidden; margin: 0; cursor: pointer; }
-.inline-photo > img { width: 100%; height: 100%; object-fit: cover; }
+.inline-photo { position: relative; width: 160px; height: 112px; flex-shrink: 0; border: 1px dashed #c4a8d0; border-radius: 8px; background: #f0e3f5; overflow: hidden; margin: 0; cursor: pointer; }
+.inline-photo > img { width: 100%; height: 100%; object-fit: contain; }
 .inline-photo > span:not(.photo-edit-overlay) { display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; height: 100%; color: #a284b2; font-size: 10px; font-weight: 400; }
 .inline-photo input { position: absolute; inset: 0; opacity: 0; padding: 0; cursor: pointer; }
 .inline-photo:focus-within { outline: 3px solid #b792ce; outline-offset: 3px; }

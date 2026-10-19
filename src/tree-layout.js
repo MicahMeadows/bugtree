@@ -1,5 +1,5 @@
 import { isCircle } from '../supabase/functions/site-api/tree-model.js'
-export const NODE_WIDTH = 310
+export const NODE_WIDTH = 370
 export const COLUMN_GAP = 90
 const ROW_GAP = 32
 const PAD = 72
